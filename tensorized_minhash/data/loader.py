@@ -180,9 +180,7 @@ class NetworkTensorBuilder:
         path = Path(csv_path)
         if not path.exists():
             raise FileNotFoundError(
-                f"CIC-IDS2017 file not found at {csv_path}. "
-                "Download from https://www.unb.ca/cic/datasets/ids-2017.html "
-                "or use NetworkLogGenerator() to work with synthetic data."
+                f"File not found"
             )
 
         df = pd.read_csv(path, low_memory=False)
@@ -197,6 +195,9 @@ class NetworkTensorBuilder:
         }
         df = df.rename(columns={k: v for k, v in rename.items() if k in df.columns})
 
+        # After the rename block, add:
+        if "label" not in df.columns:
+            df["label"] = "unknown"
         # Hash IP strings to integers
         df["src_ip"] = df["src_ip_raw"].apply(self._ip_to_int)
         df["dst_ip"] = df["dst_ip_raw"].apply(self._ip_to_int)
