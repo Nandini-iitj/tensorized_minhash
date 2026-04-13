@@ -67,9 +67,14 @@ def run_hashing_module_demo(quick: bool = False):
     shape = (n, n, n)
 
     # Generate data
-    gen = NetworkLogGenerator(n_src=n, n_dst=n, n_port=n, n_benign=2000, seed=7)
-    df, attack_groups = gen.generate()
+    #gen = NetworkLogGenerator(n_src=n, n_dst=n, n_port=n, n_benign=2000, seed=7)
+    #df, attack_groups = gen.generate()
+
     builder = NetworkTensorBuilder(n_src=n, n_dst=n, n_port=n)
+    df = builder.load_cic_ids2017("data/friday_data.csv")
+    df["label"] = "unknown"   # no label column in your file
+    attack_groups = {}         # skip attack similarity matrix
+    #builder = NetworkTensorBuilder(n_src=n, n_dst=n, n_port=n)
     tensor = builder.build_tensor(df)
 
     print(f"\nTensor shape : {tensor.shape}")
@@ -77,8 +82,12 @@ def run_hashing_module_demo(quick: bool = False):
     print(f"Density       : {tensor.mean():.4f}")
 
     # Build two tensors: one with attack, one benign-only
-    df_benign = df[df["label"] == "benign"]
-    df_attack = df[df["label"] != "benign"]
+    #df_benign = df[df["label"] == "benign"]
+    #df_attack = df[df["label"] != "benign"]
+    
+    half = len(df) // 2
+    df_benign = df.iloc[:half]
+    df_attack = df.iloc[half:]
     tensor_benign = builder.build_tensor(df_benign)
     tensor_attack = builder.build_tensor(df_attack)
 
@@ -232,13 +241,15 @@ def run_scalability_prototype(quick: bool = False, use_spark: bool = False):
     from data.loader import NetworkLogGenerator, NetworkTensorBuilder
     from spark.distributed_hasher import LocalTensorHashPipeline
 
-    n = 30 if quick else 50
+    n = 50 if quick else 100
     n_windows = 20 if quick else 60
     shape = (n, n, n)
 
     print(f"\nGenerating {n_windows} time-window tensors  (shape={shape})…")
-    gen = NetworkLogGenerator(n_src=n, n_dst=n, n_port=n, n_benign=5000, seed=2024)
-    df, _ = gen.generate()
+    #gen = NetworkLogGenerator(n_src=n, n_dst=n, n_port=n, n_benign=5000, seed=2024)
+    #df, _ = gen.generate()
+    builder_temp = NetworkTensorBuilder(n_src=n, n_dst=n, n_port=n)
+    df = builder_temp.load_cic_ids2017("data/friday_data.csv")
     builder = NetworkTensorBuilder(n_src=n, n_dst=n, n_port=n)
     tensors = builder.build_tensor_batch(df, window_size=len(df) // n_windows)
     tensors = tensors[:n_windows]
