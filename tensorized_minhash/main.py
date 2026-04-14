@@ -11,6 +11,7 @@ Usage:
     python main.py              # full run
     python main.py --quick      # reduced sizes, faster
     python main.py --spark      # enable PySpark (requires pyspark installed)
+    python main.py --only 2     # run only deliverable 2
 """
 
 import sys
@@ -54,6 +55,44 @@ def table(headers, rows, col_widths=None):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# Shared: load and filter real data
+# ─────────────────────────────────────────────────────────────────────────────
+
+def load_and_filter(csv_path: str):
+    """
+    Load CIC-IDS2017 CSV, filter noise, return (df_filtered, shape).
+    """
+    from data.loader import NetworkTensorBuilder
+
+    builder_temp = NetworkTensorBuilder(1, 1, 1)
+    df = builder_temp.load_cic_ids2017(csv_path)
+
+    n_src_raw  = df['src_ip_raw'].nunique()
+    n_dst_raw  = df['dst_ip_raw'].nunique()
+    n_port_raw = df['port'].nunique()
+    print(f"\nOriginal Dataset:")
+    print(f"  Total rows    : {len(df):,}")
+    print(f"  Unique src IPs: {n_src_raw}  |  dst IPs: {n_dst_raw}  |  ports: {n_port_raw}")
+
+    port_counts = df['port'].value_counts()
+    meaningful_ports = port_counts[port_counts > 10].index
+    df_filtered = df[df['port'].isin(meaningful_ports)].copy()
+
+    dst_counts = df_filtered['dst_ip_raw'].value_counts()
+    meaningful_dsts = dst_counts[dst_counts > 100].index
+    df_filtered = df_filtered[df_filtered['dst_ip_raw'].isin(meaningful_dsts)].copy()
+
+    n_src  = df_filtered['src_ip_raw'].nunique()
+    n_dst  = df_filtered['dst_ip_raw'].nunique()
+    n_port = df_filtered['port'].nunique()
+
+    print(f"Filtered rows : {len(df_filtered):,}")
+    print(f"Unique src IPs: {n_src}  |  dst IPs: {n_dst}  |  ports: {n_port}")
+
+    return df_filtered, (n_src, n_dst, n_port)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # Deliverable 1: Tensor-Aware Hashing Module
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -61,104 +100,91 @@ def run_hashing_module_demo(quick: bool = False):
     section("DELIVERABLE 1 — Tensor-Aware Hashing Module")
 
     from core.tt_minhash import KroneckerMinHash, TTDecomposedMinHash, TTMinHashConfig
-    from data.loader import NetworkLogGenerator, NetworkTensorBuilder
+    from data.loader import NetworkTensorBuilder
+    from benchmarks.benchmark import ground_truth_jaccard, datasketch_jaccard
 
-    n = 30 if quick else 50
-    shape = (n, n, n)
+    # Load and filter real data
+    df_filtered, (n_src, n_dst, n_port) = load_and_filter("data/wed_data.csv")
 
-    # Generate data
-    #gen = NetworkLogGenerator(n_src=n, n_dst=n, n_port=n, n_benign=2000, seed=7)
-    #df, attack_groups = gen.generate()
+    shape = (30, 30, 30) if quick else (n_src, n_dst, n_port)
+    print(f"Tensor shape  : {shape}")
 
-    builder = NetworkTensorBuilder(n_src=n, n_dst=n, n_port=n)
-    df = builder.load_cic_ids2017("data/friday_data.csv")
-    df["label"] = "unknown"   # no label column in your file
-    attack_groups = {}         # skip attack similarity matrix
-    #builder = NetworkTensorBuilder(n_src=n, n_dst=n, n_port=n)
-    tensor = builder.build_tensor(df)
+    builder = NetworkTensorBuilder(n_src=shape[0], n_dst=shape[1], n_port=shape[2])
 
-    print(f"\nTensor shape : {tensor.shape}")
-    print(f"Non-zero cells: {int(tensor.sum()):,}  /  {tensor.size:,}")
-    print(f"Density       : {tensor.mean():.4f}")
+    # Full tensor
+    tensor = builder.build_tensor(df_filtered)
+    print(f"\nFull tensor:")
+    print(f"  Non-zero cells : {int(tensor.sum()):,}  /  {tensor.size:,}")
+    print(f"  Density        : {tensor.mean():.4f}")
 
-    # Build two tensors: one with attack, one benign-only
-    #df_benign = df[df["label"] == "benign"]
-    #df_attack = df[df["label"] != "benign"]
-    
-    half = len(df) // 2
-    df_benign = df.iloc[:half]
-    df_attack = df.iloc[half:]
-    tensor_benign = builder.build_tensor(df_benign)
-    tensor_attack = builder.build_tensor(df_attack)
+    # Meaningful split: common ports vs unusual ports
+    common_ports = [80, 443, 22, 53, 389, 88]
+    df_common  = df_filtered[df_filtered['port'].isin(common_ports)]
+    df_unusual = df_filtered[~df_filtered['port'].isin(common_ports)]
 
-    # Hash both
-    cfg = TTMinHashConfig(shape=shape, num_hashes=128, seed=42)
+    # Fall back to chronological split if one side is empty
+    if len(df_common) == 0 or len(df_unusual) == 0:
+        print("\nPort-based split empty — falling back to chronological split")
+        half = len(df_filtered) // 2
+        df_common  = df_filtered.iloc[:half]
+        df_unusual = df_filtered.iloc[half:]
+
+    tensor_common  = builder.build_tensor(df_common)
+    tensor_unusual = builder.build_tensor(df_unusual)
+
+    print(f"\nCommon-port tensor  nonzeros: {int(tensor_common.sum()):,}")
+    print(f"Unusual-port tensor nonzeros: {int(tensor_unusual.sum()):,}")
+
+    # Hash both with Kron and TT
+    cfg  = TTMinHashConfig(shape=shape, num_hashes=128, seed=42)
     kron = KroneckerMinHash(cfg)
     tt   = TTDecomposedMinHash(cfg)
 
-    sig_kron_b = kron.hash_tensor(tensor_benign)
-    sig_kron_a = kron.hash_tensor(tensor_attack)
-    sig_tt_b   = tt.hash_tensor(tensor_benign)
-    sig_tt_a   = tt.hash_tensor(tensor_attack)
+    sig_kron_c = kron.hash_tensor(tensor_common)
+    sig_kron_u = kron.hash_tensor(tensor_unusual)
+    sig_tt_c   = tt.hash_tensor(tensor_common)
+    sig_tt_u   = tt.hash_tensor(tensor_unusual)
 
-    j_kron = kron.jaccard_from_signatures(sig_kron_b, sig_kron_a)
-    j_tt   = tt.jaccard_from_signatures(sig_tt_b, sig_tt_a)
+    j_kron  = kron.jaccard_from_signatures(sig_kron_c, sig_kron_u)
+    j_tt    = tt.jaccard_from_signatures(sig_tt_c, sig_tt_u)
+    j_exact = ground_truth_jaccard(tensor_common, tensor_unusual)
+    j_ds    = datasketch_jaccard(tensor_common, tensor_unusual, num_perm=128)
 
-    from benchmarks.benchmark import ground_truth_jaccard, datasketch_jaccard
-    j_exact = ground_truth_jaccard(tensor_benign, tensor_attack)
-    j_ds    = datasketch_jaccard(tensor_benign, tensor_attack, num_perm=128)
-
-    print("\nJaccard similarity (benign vs attack traffic tensors):")
+    print("\nJaccard similarity (common ports vs unusual ports):")
     table(
         ["Method", "Jaccard", "Error vs exact"],
         [
-            ["Exact (ground truth)",  f"{j_exact:.4f}", "—"],
-            ["Datasketch baseline",   f"{j_ds:.4f}",    f"{abs(j_ds-j_exact):.4f}"],
-            ["Tensorized Kron",       f"{j_kron:.4f}",  f"{abs(j_kron-j_exact):.4f}"],
-            ["Tensor Train (TT)",     f"{j_tt:.4f}",    f"{abs(j_tt-j_exact):.4f}"],
+            ["Exact (ground truth)", f"{j_exact:.4f}", "—"],
+            ["Datasketch baseline",  f"{j_ds:.4f}",    f"{abs(j_ds-j_exact):.4f}"],
+            ["Tensorized Kron",      f"{j_kron:.4f}",  f"{abs(j_kron-j_exact):.4f}"],
+            ["Tensor Train (TT)",    f"{j_tt:.4f}",    f"{abs(j_tt-j_exact):.4f}"],
         ],
         col_widths=[24, 10, 20],
     )
 
-    # Show attack group detection
-    print("\nAttack pattern similarity matrix (Kron MinHash):")
-    labels = list(attack_groups.keys())
-    attack_tensors = {}
-    for lbl in labels:
-        at = np.zeros(shape, dtype=np.float32)
-        for (s, d, p) in attack_groups[lbl]:
-            at[s % n, d % n, p % n] = 1.0
-        attack_tensors[lbl] = at
-
-    sigs = {lbl: kron.hash_tensor(at) for lbl, at in attack_tensors.items()}
-
-    header = [""] + labels
-    rows = []
-    for a in labels:
-        row = [a]
-        for b in labels:
-            if a == b:
-                row.append("1.0000")
-            else:
-                j = kron.jaccard_from_signatures(sigs[a], sigs[b])
-                row.append(f"{j:.4f}")
-        rows.append(row)
-    table(header, rows)
+    # Memory summary
+    mem = kron.memory_stats()
+    print(f"\nKron parameters : {mem['kron_params']:,}")
+    print(f"Full parameters : {mem['full_params_theoretical']:,}")
+    print(f"Compression     : {mem['compression_ratio']:,}×")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Deliverable 2: Computational Resource Profile
+# Computational Resource Profile
 # ─────────────────────────────────────────────────────────────────────────────
 
-def run_resource_profile(quick: bool = False):
-    section("DELIVERABLE 2 — Computational Resource Profile")
+def run_resource_profile(quick: bool = False, real_tensors: list = None):
+    section("Computational Resource Profile")
 
     from benchmarks.benchmark import (
-        benchmark_memory, benchmark_accuracy, benchmark_speed, benchmark_ram
+        benchmark_memory,
+        benchmark_accuracy, benchmark_accuracy_from_tensors,
+        benchmark_speed, benchmark_speed_real,
+        benchmark_ram,
     )
 
-    # 2a: Memory footprint across tensor orders / sizes
-    print("\n── 2a. Parameter count: Kronecker vs full matrix ──\n")
+    # Parameter count across tensor sizes
+    print("\n Parameter count: Kronecker vs Full matrix \n")
     shapes_3d = [(10,10,10), (30,30,30), (50,50,50), (100,100,100)]
     shapes_4d = [(10,10,10,10), (20,20,20,20)]
     all_shapes = shapes_3d + ([] if quick else shapes_4d)
@@ -179,11 +205,28 @@ def run_resource_profile(quick: bool = False):
         col_widths=[22, 14, 14, 18, 14],
     )
 
-    # 2b: Accuracy vs datasketch baseline
-    print("\n── 2b. Jaccard approximation accuracy ──\n")
-    n = 50 if quick else 200
-    shape = (30, 30, 30)
-    acc = benchmark_accuracy(n_pairs=n, shape=shape, num_hashes=128)
+    # Accuracy
+    print("\n Jaccard approximation accuracy \n")
+
+    if real_tensors is not None and len(real_tensors) >= 2:
+        # Use real tensors 
+        #print("  Using real time-window tensors from Deliverable 3\n")
+        n_pairs = 50 if quick else 200
+        acc = benchmark_accuracy_from_tensors(
+            tensors=real_tensors,
+            shape=real_tensors[0].shape,
+            num_hashes=128,
+            n_pairs=n_pairs,
+        )
+        #print(f"  Windows : {acc['n_windows']}  |  "
+        #      f"Pairs   : {acc['n_pairs']}  |  "
+        #      f"Jaccard range: [{acc['jaccard_range'][0]:.3f}, "
+        #      f"{acc['jaccard_range'][1]:.3f}]")
+    else:
+        # Fall back to synthetic data
+        print("  No real tensors provided — using synthetic data\n")
+        n_pairs = 50 if quick else 200
+        acc = benchmark_accuracy(n_pairs=n_pairs, shape=(30,30,30), num_hashes=128)
 
     table(
         ["Method", "MAE", "RMSE", "Pearson r"],
@@ -200,10 +243,19 @@ def run_resource_profile(quick: bool = False):
         col_widths=[22, 10, 10, 12],
     )
 
-    # 2c: Speed comparison
-    print("\n── 2c. Hashing throughput ──\n")
-    n_t = 100 if quick else 500
-    speed = benchmark_speed(shape=(30, 30, 30), num_hashes=128, n_tensors=n_t)
+    # Speed
+    print("\n Hashing throughput\n")
+
+    if real_tensors is not None and len(real_tensors) >= 2:
+        #print("  Using real time-window tensors from Deliverable 3\n")
+        n_t = 20 if quick else len(real_tensors)
+        speed = benchmark_speed_real(
+            tensors=real_tensors[:n_t],
+            num_hashes=128,
+        )
+    else:
+        n_t = 100 if quick else 500
+        speed = benchmark_speed(shape=(30,30,30), num_hashes=128, n_tensors=n_t)
 
     table(
         ["Method", "Tensors/sec", "ms/tensor"],
@@ -216,61 +268,132 @@ def run_resource_profile(quick: bool = False):
         col_widths=[14, 14, 12],
     )
 
-    # 2d: Peak RAM
-    print("\n── 2d. Peak RAM allocation ──\n")
-    ram = benchmark_ram(shape=(50, 50, 50), num_hashes=128)
-    table(
-        ["", "Value"],
+    # Peak RAM
+    #print("\nPeak RAM allocation\n")
+    ram_shape = real_tensors[0].shape if real_tensors else (50, 50, 50)
+    ram = benchmark_ram(shape=ram_shape, num_hashes=128)
+    
+
+    #table(
+    #["Method", "Peak RAM", "Params", "vs Full matrix"],
+    #[
+    #    ["Full matrix (standard vectoriz.)",
+    #     f"{ram['full_theoretical_mb']:.2f} MB",
+    #     f"{ram['full_params']:,}",
+    #     "1×"],
+    #    ["Tensor Train (TT) decomposition",
+    #     f"{ram['tt_peak_mb']:.2f} MB",
+    #     f"{ram['tt_params']:,}",
+    #     f"{ram['tt_vs_full']:.0f}×"],
+    #    ["Kronecker decomposition (Kron)",
+    #     f"{ram['kron_peak_mb']:.2f} MB",
+    #     f"{ram['kron_params']:,}",
+    #     f"{ram['kron_vs_full']:.0f}×"],
+    #],
+    #col_widths=[35, 12, 16, 16],
+    #)
+    #print(f"\n  Kron is {ram['kron_vs_tt']:.1f}× more compact than TT decomposition")
+    #table(
+    #    ["", "Value"],
+    #    [
+    #        ["Kron peak RAM",              f"{ram['kron_peak_mb']:.2f} MB"],
+    #        ["Datasketch peak RAM",        f"{ram['datasketch_peak_mb']:.2f} MB"],
+    #        ["Full matrix (theoretical)",  f"{ram['full_theoretical_mb']:.2f} MB"],
+    #        ["Kron RAM savings (vs full)", f"{ram['ram_compression']:.1f}×"],
+    #        ["Kron vs Datasketch",         f"{ram['kron_vs_datasketch']:.1f}×"],
+    #    ],
+    #    col_widths=[30, 20],
+    #)
+
+    print("\nStandard vectorization vs Tensor Decomposition\n")
+
+    from benchmarks.benchmark import benchmark_random_projection
+    rp = benchmark_random_projection(real_tensors, num_hashes=128)
+
+    if rp["feasible"]:
+        table(
+            ["Method", "RAM", "Tensors/sec", "ms/tensor"],
+            [
+            ["Random Projection (standard)",
+             f"{rp['theoretical_mb']:.1f} MB",
+             f"{rp['tensors_per_sec']:.1f}",
+             f"{rp['per_tensor_ms']:.2f}"],
+            ["Kronecker (tensor decomp.)",
+             f"{ram['kron_peak_mb']:.2f} MB",
+             f"{speed['Kron']['tensors_per_sec']:.1f}",
+             f"{speed['Kron']['per_tensor_ms']:.2f}"],
+            ],
+        col_widths=[30, 12, 14, 12],
+            )
+    else:
+        print(f"  Random Projection: {rp['note']}")
+        print(f"  Kronecker:         {ram['kron_peak_mb']:.2f} MB  "
+          f"({ram['kron_vs_full']:.0f}× smaller)\n")
+        table(
+        ["Method", "RAM required", "Feasible?", "Params"],
         [
-            ["Kron peak RAM",              f"{ram['kron_peak_mb']:.2f} MB"],
-            ["Full matrix (theoretical)",  f"{ram['full_theoretical_mb']:.2f} MB"],
-            ["RAM savings",                f"{ram['ram_compression']:.1f}×"],
+            ["Full Random Projection",
+             f"{rp['theoretical_mb']:.0f} MB",
+             "No — too large",
+             f"{rp['flat_dim']*128:,}"],
+            ["Tensor Train (TT)",
+             f"{ram['tt_peak_mb']:.2f} MB",
+             "Yes",
+             f"{ram['tt_params']:,}"],
+            ["Kronecker decomposition",
+             f"{ram['kron_peak_mb']:.2f} MB",
+             "Yes",
+             f"{ram['kron_params']:,}"],
         ],
-        col_widths=[30, 20],
-    )
-
-
+        col_widths=[26, 14, 16, 18],
+            )
+    print(f"\n  Kron is {ram['kron_vs_tt']:.1f}× more compact than TT decomposition")
 # ─────────────────────────────────────────────────────────────────────────────
-# Deliverable 3: Local Scalability Prototype (PySpark or multiprocessing)
+# Local Scalability Prototype (PySpark or multiprocessing)
 # ─────────────────────────────────────────────────────────────────────────────
 
 def run_scalability_prototype(quick: bool = False, use_spark: bool = False):
-    section("DELIVERABLE 3 — Local Scalability Prototype")
+    section("Local Scalability Prototype")
 
     from core.tt_minhash import KroneckerMinHash, TTMinHashConfig
-    from data.loader import NetworkLogGenerator, NetworkTensorBuilder
+    from data.loader import NetworkTensorBuilder
     from spark.distributed_hasher import LocalTensorHashPipeline
 
-    n = 50 if quick else 100
     n_windows = 20 if quick else 60
-    shape = (n, n, n)
 
-    print(f"\nGenerating {n_windows} time-window tensors  (shape={shape})…")
-    #gen = NetworkLogGenerator(n_src=n, n_dst=n, n_port=n, n_benign=5000, seed=2024)
-    #df, _ = gen.generate()
-    builder_temp = NetworkTensorBuilder(n_src=n, n_dst=n, n_port=n)
-    df = builder_temp.load_cic_ids2017("data/friday_data.csv")
-    builder = NetworkTensorBuilder(n_src=n, n_dst=n, n_port=n)
-    tensors = builder.build_tensor_batch(df, window_size=len(df) // n_windows)
+    # Load and filter real data
+    df_filtered, (n_src, n_dst, n_port) = load_and_filter("data/wed_data.csv")
+
+    print(f"Window size: {len(df_filtered) // n_windows:,} rows per window")
+
+    shape = (30, 30, 30) if quick else (n_src, n_dst, n_port)
+    print(f"Tensor shape: {shape}")
+    print(f"Building {n_windows} time-window tensors…")
+
+    builder = NetworkTensorBuilder(n_src=shape[0], n_dst=shape[1], n_port=shape[2])
+    tensors = builder.build_tensor_batch(
+        df_filtered, window_size=len(df_filtered) // n_windows
+    )
     tensors = tensors[:n_windows]
     ids = [f"w{i:03d}" for i in range(len(tensors))]
 
-    cfg = TTMinHashConfig(shape=shape, num_hashes=128)
+    cfg    = TTMinHashConfig(shape=shape, num_hashes=128)
     hasher = KroneckerMinHash(cfg)
 
     if use_spark:
         try:
             from spark.distributed_hasher import SparkTensorHasher, _get_or_create_spark
+            import time
             spark = _get_or_create_spark()
-            pipe = SparkTensorHasher(hasher, spark=spark)
-            sc = spark.sparkContext
-            rdd = SparkTensorHasher.tensors_to_rdd(tensors, sc, ids)
+            pipe  = SparkTensorHasher(hasher, spark=spark)
+            sc    = spark.sparkContext
+            rdd   = SparkTensorHasher.tensors_to_rdd(tensors, sc, ids)
             print("Running Spark hash map…")
-            import time; t0 = time.perf_counter()
-            sig_rdd = pipe.hash_rdd(rdd)
+            t0 = time.perf_counter()
+            sig_rdd     = pipe.hash_rdd(rdd)
             similar_rdd = pipe.find_similar_pairs(sig_rdd, threshold=0.4)
-            similar = similar_rdd.collect()
-            elapsed = time.perf_counter() - t0
+            similar     = similar_rdd.collect()
+            elapsed     = time.perf_counter() - t0
             print(f"Spark: {len(tensors)} tensors in {elapsed:.2f}s")
         except Exception as e:
             print(f"Spark unavailable ({e}); falling back to multiprocessing")
@@ -278,8 +401,8 @@ def run_scalability_prototype(quick: bool = False, use_spark: bool = False):
 
     if not use_spark:
         import time
-        pipe = LocalTensorHashPipeline(hasher)
-        t0 = time.perf_counter()
+        pipe    = LocalTensorHashPipeline(hasher)
+        t0      = time.perf_counter()
         id_sigs = pipe.hash_all(tensors, ids, parallel=True)
         similar = pipe.find_similar_pairs(id_sigs, threshold=0.45)
         elapsed = time.perf_counter() - t0
@@ -294,13 +417,16 @@ def run_scalability_prototype(quick: bool = False, use_spark: bool = False):
             col_widths=[12, 12, 14],
         )
     else:
-        print("  None above threshold — traffic is diverse (expected for random data)")
+        print("  None above threshold — traffic is diverse")
 
     mem = hasher.memory_stats()
-    print(f"\nHash-function memory: {mem['kron_bytes']:,} bytes "
+    print(f"\nHash-function memory : {mem['kron_bytes']:,} bytes "
           f"({mem['kron_bytes']/1024:.1f} KB) for {cfg.num_hashes} hash planes")
     print(f"Equivalent full matrix: {mem['full_bytes_theoretical']/1_000_000:.1f} MB")
-    print(f"Compression: {mem['compression_ratio']:,}×")
+    print(f"Compression           : {mem['compression_ratio']:,}×")
+
+    # Return tensors so D2 can reuse them
+    return tensors
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -309,26 +435,27 @@ def run_scalability_prototype(quick: bool = False, use_spark: bool = False):
 
 def main():
     parser = argparse.ArgumentParser(description="Tensorized MinHash pipeline")
-    parser.add_argument("--quick",  action="store_true", help="Smaller sizes for fast demo")
-    parser.add_argument("--spark",  action="store_true", help="Enable PySpark distributed mode")
-    parser.add_argument("--only",   choices=["1", "2", "3"], help="Run only one deliverable")
+    parser.add_argument("--quick", action="store_true", help="Smaller sizes for fast demo")
+    parser.add_argument("--spark", action="store_true", help="Enable PySpark distributed mode")
+    parser.add_argument("--only",  choices=["1", "2", "3"], help="Run only one deliverable")
     args = parser.parse_args()
 
-    print("\n" + "█"*64)
-    print("  Tensorized MinHash — TT/Kronecker Compressed Hashing")
-    print("  Jaccard Similarity on Multi-Dimensional Network Tensors")
-    print("█"*64)
 
-    if args.only != "2" and args.only != "3":
+    print("  Tensorized MinHash — Kronecker Compressed Hashing")
+    print("  Jaccard Similarity on Multi-Dimensional Network Tensors")
+
+    real_tensors = None
+
+    if args.only in (None, "3"):
+        real_tensors = run_scalability_prototype(
+            quick=args.quick, use_spark=args.spark
+        )
+
+    if args.only in (None, "1"):
         run_hashing_module_demo(quick=args.quick)
 
-    if args.only != "1" and args.only != "3":
-        run_resource_profile(quick=args.quick)
-
-    if args.only != "1" and args.only != "2":
-        run_scalability_prototype(quick=args.quick, use_spark=args.spark)
-
-    print("\n✓ All deliverables complete.\n")
+    if args.only in (None, "2"):
+        run_resource_profile(quick=args.quick, real_tensors=real_tensors)
 
 
 if __name__ == "__main__":
