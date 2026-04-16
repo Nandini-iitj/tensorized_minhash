@@ -15,7 +15,7 @@ Scalability argument:
   Spark broadcast variable (recommended < 10 MB). Workers never OOM from
   hash-function parameters regardless of cluster size.
 """
-
+import os
 import numpy as np
 import pickle
 import logging
@@ -44,13 +44,46 @@ def _get_or_create_spark(app_name: str = "TensorizedMinHash") -> "SparkSession":
     if not SPARK_AVAILABLE:
         raise ImportError("PySpark is required. pip install pyspark")
 
+    #spark = (
+    #    SparkSession.builder
+    #    .appName(app_name)
+    #    .master("local[*]")
+    #    .config("spark.driver.memory", "4g")
+    #    .config("spark.executor.memory", "4g")
+        # Reduce log noise for demos
+    #    .config("spark.ui.showConsoleProgress", "false")
+    #    .getOrCreate()
+    #)
+    num_cores = os.environ.get("SLURM_CPUS_PER_TASK", "4")
     spark = (
         SparkSession.builder
         .appName(app_name)
-        .master("local[*]")
+        .master(f"local[{num_cores}]")
         .config("spark.driver.memory", "4g")
-        .config("spark.executor.memory", "4g")
+        .config("spark.executor.memory", "24g")
         # Reduce log noise for demos
+        .config("spark.ui.showConsoleProgress", "false")
+        .getOrCreate()
+    )
+    spark.sparkContext.setLogLevel("WARN")
+    return spark
+
+def _get_or_create_spark1(app_name: str = "TensorizedMinHash") -> "SparkSession":
+    """Create a Spark session — uses SPARK_MASTER env var if set, else local[*]."""
+    if not SPARK_AVAILABLE:
+        raise ImportError("PySpark is required. pip install pyspark")
+
+    master = os.environ.get("SPARK_MASTER_URL", "local[*]")
+    driver_mem = os.environ.get("SPARK_DRIVER_MEMORY", "4g")
+    executor_mem = os.environ.get("SPARK_EXECUTOR_MEMORY", "4g")
+
+    spark = (
+        SparkSession.builder
+        .appName(app_name)
+        .master(master)
+        .config("spark.driver.memory", driver_mem)
+        .config("spark.executor.memory", executor_mem)
+        .config("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
         .config("spark.ui.showConsoleProgress", "false")
         .getOrCreate()
     )
