@@ -137,11 +137,11 @@ class NetworkTensorBuilder:
 
         tensor[src_idx, dst_idx, port_idx] = 1.0
         density = tensor.mean()
-        logger.info(
-            f"Tensor shape={tensor.shape}, "
-            f"nonzeros={int(tensor.sum()):,}, "
-            f"density={density:.4f}"
-        )
+        #logger.info(
+        #    f"Tensor shape={tensor.shape}, "
+        #    f"nonzeros={int(tensor.sum()):,}, "
+        #    f"density={density:.4f}"
+        #)
         return tensor
 
     def build_tensor_batch(
@@ -203,7 +203,7 @@ class NetworkTensorBuilder:
         df["dst_ip"] = df["dst_ip_raw"].apply(self._ip_to_int)
         df["port"] = pd.to_numeric(df["port"], errors="coerce").fillna(0).astype(int)
 
-        logger.info(f"Loaded CIC-IDS2017: {len(df):,} rows, {df['label'].nunique()} classes")
+        logger.info(f"Loaded CIC-IDS2017: {len(df):,} rows")
         return df
 
     @staticmethod
