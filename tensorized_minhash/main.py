@@ -93,11 +93,11 @@ def load_and_filter(csv_path: str):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Deliverable 1: Tensor-Aware Hashing Module
+# Tensor-Aware Hashing Module
 # ─────────────────────────────────────────────────────────────────────────────
 
 def run_hashing_module_demo(quick: bool = False):
-    section("DELIVERABLE 1 — Tensor-Aware Hashing Module")
+    section("Tensor-Aware Hashing Module")
 
     from core.tt_minhash import KroneckerMinHash, TTDecomposedMinHash, TTMinHashConfig
     from data.loader import NetworkTensorBuilder
@@ -113,54 +113,14 @@ def run_hashing_module_demo(quick: bool = False):
 
     # Full tensor
     tensor = builder.build_tensor(df_filtered)
-    print(f"\nFull tensor:")
-    print(f"  Non-zero cells : {int(tensor.sum()):,}  /  {tensor.size:,}")
-    print(f"  Density        : {tensor.mean():.4f}")
-
-    # Meaningful split: common ports vs unusual ports
-    common_ports = [80, 443, 22, 53, 389, 88]
-    df_common  = df_filtered[df_filtered['port'].isin(common_ports)]
-    df_unusual = df_filtered[~df_filtered['port'].isin(common_ports)]
-
-    # Fall back to chronological split if one side is empty
-    if len(df_common) == 0 or len(df_unusual) == 0:
-        print("\nPort-based split empty — falling back to chronological split")
-        half = len(df_filtered) // 2
-        df_common  = df_filtered.iloc[:half]
-        df_unusual = df_filtered.iloc[half:]
-
-    tensor_common  = builder.build_tensor(df_common)
-    tensor_unusual = builder.build_tensor(df_unusual)
-
-    print(f"\nCommon-port tensor  nonzeros: {int(tensor_common.sum()):,}")
-    print(f"Unusual-port tensor nonzeros: {int(tensor_unusual.sum()):,}")
+    #print(f"\nFull tensor:")
+    #print(f"  Non-zero cells : {int(tensor.sum()):,}  /  {tensor.size:,}")
+    #print(f"  Density        : {tensor.mean():.4f}")
 
     # Hash both with Kron and TT
     cfg  = TTMinHashConfig(shape=shape, num_hashes=128, seed=42)
     kron = KroneckerMinHash(cfg)
     tt   = TTDecomposedMinHash(cfg)
-
-    sig_kron_c = kron.hash_tensor(tensor_common)
-    sig_kron_u = kron.hash_tensor(tensor_unusual)
-    sig_tt_c   = tt.hash_tensor(tensor_common)
-    sig_tt_u   = tt.hash_tensor(tensor_unusual)
-
-    j_kron  = kron.jaccard_from_signatures(sig_kron_c, sig_kron_u)
-    j_tt    = tt.jaccard_from_signatures(sig_tt_c, sig_tt_u)
-    j_exact = ground_truth_jaccard(tensor_common, tensor_unusual)
-    j_ds    = datasketch_jaccard(tensor_common, tensor_unusual, num_perm=128)
-
-    print("\nJaccard similarity (common ports vs unusual ports):")
-    table(
-        ["Method", "Jaccard", "Error vs exact"],
-        [
-            ["Exact (ground truth)", f"{j_exact:.4f}", "—"],
-            ["Datasketch baseline",  f"{j_ds:.4f}",    f"{abs(j_ds-j_exact):.4f}"],
-            ["Tensorized Kron",      f"{j_kron:.4f}",  f"{abs(j_kron-j_exact):.4f}"],
-            ["Tensor Train (TT)",    f"{j_tt:.4f}",    f"{abs(j_tt-j_exact):.4f}"],
-        ],
-        col_widths=[24, 10, 20],
-    )
 
     # Memory summary
     mem = kron.memory_stats()
@@ -228,20 +188,38 @@ def run_resource_profile(quick: bool = False, real_tensors: list = None):
         n_pairs = 50 if quick else 200
         acc = benchmark_accuracy(n_pairs=n_pairs, shape=(30,30,30), num_hashes=128)
 
+    method_map = {
+    "tensorized_kron":     "Tensorized Kron",
+    "tt_decomposition":    "Tensor Train (TT)",
+    "datasketch_baseline": "Datasketch baseline",
+    "random_projection":   "Random Projection",
+    }
+    rows = [
+    [method_map[k],
+     f"{acc[k]['mae']:.4f}",
+     f"{acc[k]['rmse']:.4f}",
+     f"{acc[k]['pearson_r']:.4f}"]
+    for k in method_map if k in acc
+    ]
     table(
-        ["Method", "MAE", "RMSE", "Pearson r"],
-        [
-            ["Tensorized Kron",
-             f"{acc['tensorized_kron']['mae']:.4f}",
-             f"{acc['tensorized_kron']['rmse']:.4f}",
-             f"{acc['tensorized_kron']['pearson_r']:.4f}"],
-            ["Datasketch baseline",
-             f"{acc['datasketch_baseline']['mae']:.4f}",
-             f"{acc['datasketch_baseline']['rmse']:.4f}",
-             f"{acc['datasketch_baseline']['pearson_r']:.4f}"],
-        ],
-        col_widths=[22, 10, 10, 12],
+    ["Method", "MAE", "RMSE", "Pearson r"],
+    rows,
+    col_widths=[24, 10, 10, 12],
     )
+    #table(
+    #    ["Method", "MAE", "RMSE", "Pearson r"],
+    #    [
+    #        ["Tensorized Kron",
+    #         f"{acc['tensorized_kron']['mae']:.4f}",
+    #         f"{acc['tensorized_kron']['rmse']:.4f}",
+    #         f"{acc['tensorized_kron']['pearson_r']:.4f}"],
+    #        ["Datasketch baseline",
+    #         f"{acc['datasketch_baseline']['mae']:.4f}",
+    #         f"{acc['datasketch_baseline']['rmse']:.4f}",
+    #         f"{acc['datasketch_baseline']['pearson_r']:.4f}"],
+    #    ],
+    #    col_widths=[22, 10, 10, 12],
+    #)
 
     # Speed
     print("\n Hashing throughput\n")
@@ -395,6 +373,7 @@ def run_scalability_prototype(quick: bool = False, use_spark: bool = False):
             similar     = similar_rdd.collect()
             elapsed     = time.perf_counter() - t0
             print(f"Spark: {len(tensors)} tensors in {elapsed:.2f}s")
+            spark.stop()
         except Exception as e:
             print(f"Spark unavailable ({e}); falling back to multiprocessing")
             use_spark = False
@@ -445,18 +424,18 @@ def main():
     print("  Jaccard Similarity on Multi-Dimensional Network Tensors")
 
     real_tensors = None
+    
+    if args.only in (None, "1"):
+        run_hashing_module_demo(quick=args.quick)
 
     if args.only in (None, "3"):
         real_tensors = run_scalability_prototype(
             quick=args.quick, use_spark=args.spark
         )
 
-    if args.only in (None, "1"):
-        run_hashing_module_demo(quick=args.quick)
-
     if args.only in (None, "2"):
         run_resource_profile(quick=args.quick, real_tensors=real_tensors)
-
+    
 
 if __name__ == "__main__":
     main()
