@@ -1,0 +1,89 @@
+version: "3.9"
+
+x-worker-defaults: &worker-defaults
+  restart: "no"
+  mem_limit: 4g
+  cpus: 2.0
+  environment:
+    SHARED_INPUT_DIR: /shared_input
+    SCORES_DIR: /scores
+    NUM_HASHES: "512"
+    SEED: "42"
+  volumes:
+    - shared_input:/shared_input:ro
+    - scores:/scores
+
+services:
+
+  # — Input generator —
+  generate_input:
+    build:
+      context: ../..
+      dockerfile: demo/racing/shared_input/Dockerfile
+    container_name: racing_generate_input
+    restart: "no"
+    environment:
+      LOAD_LEVEL: "${LOAD_LEVEL:-9}"
+      OUT_DIR: /shared_input
+    volumes:
+      - shared_input:/shared_input
+
+  # — Workers —
+  worker_kron:
+    <<: *worker-defaults
+    build:
+      context: ../..
+      dockerfile: demo/racing/worker_kron/Dockerfile
+    container_name: racing_worker_kron
+    environment:
+      SHARED_INPUT_DIR: /shared_input
+      SCORES_DIR: /scores
+      NUM_HASHES: "512"
+      SEED: "42"
+    depends_on:
+      generate_input:
+        condition: service_completed_successfully
+
+  worker_tt:
+    <<: *worker-defaults
+    build:
+      context: ../..
+      dockerfile: demo/racing/worker_tt/Dockerfile
+    container_name: racing_worker_tt
+    environment:
+      SHARED_INPUT_DIR: /shared_input
+      SCORES_DIR: /scores
+      NUM_HASHES: "512"
+      SEED: "42"
+    depends_on:
+      generate_input:
+        condition: service_completed_successfully
+
+  # — Scoreboard —
+  scoreboard:
+    build:
+      context: ../..
+      dockerfile: demo/racing/scoreboard/Dockerfile
+    container_name: racing_scoreboard
+    mem_limit: 512m
+    ports:
+      - "8501:8501"
+    volumes:
+      - shared_input:/shared_input
+      - scores:/scores
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      SCORES_DIR: /scores
+    depends_on:
+      - generate_input
+
+volumes:
+  shared_input:
+    driver: local
+
+  scores:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./scores
