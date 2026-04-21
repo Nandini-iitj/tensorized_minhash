@@ -46,7 +46,7 @@ class NetworkLogGenerator:
     def generate(self) -> tuple[pd.DataFrame, dict[str, list]]:
         """
         Returns (DataFrame with columns [src_ip, dst_ip, port, label],
-        attack_groups: dict mapping label → list of (src, dst, port))
+        attack_groups: dict mapping label -> list of (src, dst, port))
         """
         rows = []
 
@@ -88,5 +88,5 @@ class NetworkLogGenerator:
         ]
 
         df = pd.DataFrame(rows).drop_duplicates(subset=["src_ip", "dst_ip", "port"])
-        logger.info(f"Generated {len(df)} unique connections ({len(rows)} raw)")
+        logger.info(f"Generated {len(df):,} unique connections ({len(rows):,} raw)")
         return df, attack_groups

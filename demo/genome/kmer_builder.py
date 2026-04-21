@@ -27,7 +27,7 @@ _MOD = (2**31) - 1 # Mersenne prime
 def read_fasta(path: str) -> tuple[str, str]:
     """
     Parse a single-record FASTA file.
-    Returns (header, sequence) -- sequence is upper-cased, whitespace stripped.
+    Returns (header, sequence) - sequence is upper-cased, whitespace stripped.
     """
     fasta_path = Path(path)
     if not fasta_path.exists():
@@ -46,7 +46,7 @@ def read_fasta(path: str) -> tuple[str, str]:
             seq_parts.append(line.upper())
 
     sequence = "".join(seq_parts)
-    logger.info(f"Read {fasta_path.name}: {len(sequence):,} bp  header='{header[:60]}'...")
+    logger.info(f"Read {fasta_path.name}: {len(sequence):,} bp  header='{header[:60]}'")
     return header, sequence
 
 
@@ -85,8 +85,8 @@ def kmers_to_tensor(
     (i, j, k) index. T[i, j, k] = 1 if any k-mer maps to that bucket.
 
     Shape is configurable - larger shapes reduce collision rate but increase
-    tensor sparsity. (64, 64, 64) gives ~262k cells with ~1-5% density for
-    typical mitochondrial genomes (~16k bp, k=12).
+    tensor sparsity. (64, 64, 64) gives ~262K cells with ~1-5% density for
+    typical mitochondrial genomes (~16K bp, k=12).
     """
     tensor = np.zeros(shape, dtype=np.float32)
     d0, d1, d2 = shape

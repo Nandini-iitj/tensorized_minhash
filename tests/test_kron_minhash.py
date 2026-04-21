@@ -8,7 +8,7 @@ ratio, parameter-count formula, memory_stats keys, reproducibility, symmetry.
 
 import numpy as np
 import pytest
-from benchmark import ground_truth_jaccard
+from benchmarks import ground_truth_jaccard
 from core.config import TTMinHashConfig
 from core.kron_minhash import KroneckerMinHash
 

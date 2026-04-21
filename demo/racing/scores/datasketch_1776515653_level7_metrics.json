@@ -1,0 +1,1518 @@
+{
+  "algo": "datasketch",
+  "load_level": 7,
+  "shape": [
+    70,
+    70,
+    70
+  ],
+  "n_pairs": 250,
+  "num_hashes": 256,
+  "elapsed_s": 155.893,
+  "mae": 0.0166,
+  "max_error": 0.0599,
+  "memory_kb": 2,
+  "timestamp": 1776515653,
+  "pairs": [
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.2501,
+      "datasketch": 0.2891,
+      "error": 0.0389
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0514,
+      "datasketch": 0.0234,
+      "error": 0.0279
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0371,
+      "datasketch": 0.0352,
+      "error": 0.0019
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0539,
+      "datasketch": 0.0391,
+      "error": 0.0148
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0371,
+      "datasketch": 0.0664,
+      "error": 0.0294
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0358,
+      "datasketch": 0.043,
+      "error": 0.0072
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1627,
+      "datasketch": 0.1602,
+      "error": 0.0025
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.055,
+      "datasketch": 0.0508,
+      "error": 0.0042
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0558,
+      "datasketch": 0.0469,
+      "error": 0.0089
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0562,
+      "datasketch": 0.0469,
+      "error": 0.0093
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0545,
+      "datasketch": 0.0938,
+      "error": 0.0392
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0542,
+      "datasketch": 0.0703,
+      "error": 0.0161
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1605,
+      "datasketch": 0.1758,
+      "error": 0.0153
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0537,
+      "datasketch": 0.0117,
+      "error": 0.042
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0545,
+      "datasketch": 0.0586,
+      "error": 0.0041
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0562,
+      "datasketch": 0.0391,
+      "error": 0.0172
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0557,
+      "datasketch": 0.0664,
+      "error": 0.0107
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0536,
+      "datasketch": 0.0625,
+      "error": 0.0089
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1636,
+      "datasketch": 0.168,
+      "error": 0.0043
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0547,
+      "datasketch": 0.0234,
+      "error": 0.0312
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0556,
+      "datasketch": 0.0586,
+      "error": 0.003
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0559,
+      "datasketch": 0.0273,
+      "error": 0.0286
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0548,
+      "datasketch": 0.0781,
+      "error": 0.0233
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0537,
+      "datasketch": 0.0781,
+      "error": 0.0244
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1621,
+      "datasketch": 0.1797,
+      "error": 0.0175
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0541,
+      "datasketch": 0.0508,
+      "error": 0.0033
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0567,
+      "datasketch": 0.0586,
+      "error": 0.0019
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0564,
+      "datasketch": 0.0352,
+      "error": 0.0213
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0551,
+      "datasketch": 0.082,
+      "error": 0.027
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0538,
+      "datasketch": 0.0625,
+      "error": 0.0087
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1625,
+      "datasketch": 0.207,
+      "error": 0.0445
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0533,
+      "datasketch": 0.0391,
+      "error": 0.0142
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0549,
+      "datasketch": 0.0586,
+      "error": 0.0037
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.056,
+      "datasketch": 0.0547,
+      "error": 0.0013
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0556,
+      "datasketch": 0.0664,
+      "error": 0.0108
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0543,
+      "datasketch": 0.0586,
+      "error": 0.0043
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1624,
+      "datasketch": 0.207,
+      "error": 0.0446
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0563,
+      "datasketch": 0.0352,
+      "error": 0.0211
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0553,
+      "datasketch": 0.0508,
+      "error": 0.0045
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0557,
+      "datasketch": 0.0234,
+      "error": 0.0322
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0546,
+      "datasketch": 0.0859,
+      "error": 0.0313
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0545,
+      "datasketch": 0.0703,
+      "error": 0.0158
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1625,
+      "datasketch": 0.1953,
+      "error": 0.0328
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0553,
+      "datasketch": 0.043,
+      "error": 0.0123
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0562,
+      "datasketch": 0.043,
+      "error": 0.0132
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0556,
+      "datasketch": 0.0234,
+      "error": 0.0321
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.054,
+      "datasketch": 0.082,
+      "error": 0.028
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0543,
+      "datasketch": 0.0625,
+      "error": 0.0082
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.162,
+      "datasketch": 0.207,
+      "error": 0.0451
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0551,
+      "datasketch": 0.0391,
+      "error": 0.016
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0557,
+      "datasketch": 0.0547,
+      "error": 0.001
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0555,
+      "datasketch": 0.043,
+      "error": 0.0125
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0553,
+      "datasketch": 0.0586,
+      "error": 0.0033
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0551,
+      "datasketch": 0.0664,
+      "error": 0.0113
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.163,
+      "datasketch": 0.1719,
+      "error": 0.0089
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0549,
+      "datasketch": 0.043,
+      "error": 0.0119
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0552,
+      "datasketch": 0.0586,
+      "error": 0.0034
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0563,
+      "datasketch": 0.043,
+      "error": 0.0133
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0545,
+      "datasketch": 0.0703,
+      "error": 0.0159
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0546,
+      "datasketch": 0.0742,
+      "error": 0.0196
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1626,
+      "datasketch": 0.1602,
+      "error": 0.0025
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0549,
+      "datasketch": 0.0312,
+      "error": 0.0237
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0555,
+      "datasketch": 0.0586,
+      "error": 0.0031
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0564,
+      "datasketch": 0.0312,
+      "error": 0.0251
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0545,
+      "datasketch": 0.0742,
+      "error": 0.0198
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0552,
+      "datasketch": 0.0742,
+      "error": 0.019
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.162,
+      "datasketch": 0.2031,
+      "error": 0.0411
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0549,
+      "datasketch": 0.0312,
+      "error": 0.0237
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0551,
+      "datasketch": 0.0938,
+      "error": 0.0386
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0559,
+      "datasketch": 0.0391,
+      "error": 0.0169
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0555,
+      "datasketch": 0.0898,
+      "error": 0.0343
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0543,
+      "datasketch": 0.0469,
+      "error": 0.0074
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1622,
+      "datasketch": 0.1914,
+      "error": 0.0292
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0545,
+      "datasketch": 0.0234,
+      "error": 0.0311
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0553,
+      "datasketch": 0.0625,
+      "error": 0.0072
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0574,
+      "datasketch": 0.0664,
+      "error": 0.009
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0546,
+      "datasketch": 0.0781,
+      "error": 0.0235
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0539,
+      "datasketch": 0.0547,
+      "error": 0.0008
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1627,
+      "datasketch": 0.2148,
+      "error": 0.0521
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0558,
+      "datasketch": 0.0664,
+      "error": 0.0106
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0552,
+      "datasketch": 0.0352,
+      "error": 0.02
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0555,
+      "datasketch": 0.0508,
+      "error": 0.0047
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0547,
+      "datasketch": 0.0977,
+      "error": 0.043
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0545,
+      "datasketch": 0.0547,
+      "error": 0.0002
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1622,
+      "datasketch": 0.1758,
+      "error": 0.0135
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0543,
+      "datasketch": 0.0469,
+      "error": 0.0075
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0549,
+      "datasketch": 0.0703,
+      "error": 0.0154
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0578,
+      "datasketch": 0.043,
+      "error": 0.0148
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0545,
+      "datasketch": 0.0625,
+      "error": 0.008
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0541,
+      "datasketch": 0.0469,
+      "error": 0.0072
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1611,
+      "datasketch": 0.1641,
+      "error": 0.0029
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0545,
+      "datasketch": 0.0352,
+      "error": 0.0193
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0543,
+      "datasketch": 0.0664,
+      "error": 0.0121
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0573,
+      "datasketch": 0.0391,
+      "error": 0.0182
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0556,
+      "datasketch": 0.0898,
+      "error": 0.0342
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0542,
+      "datasketch": 0.082,
+      "error": 0.0279
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1622,
+      "datasketch": 0.1797,
+      "error": 0.0175
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0538,
+      "datasketch": 0.0195,
+      "error": 0.0342
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.055,
+      "datasketch": 0.0391,
+      "error": 0.016
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0564,
+      "datasketch": 0.043,
+      "error": 0.0135
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0561,
+      "datasketch": 0.0977,
+      "error": 0.0416
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.054,
+      "datasketch": 0.0547,
+      "error": 0.0007
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1617,
+      "datasketch": 0.1602,
+      "error": 0.0015
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0523,
+      "datasketch": 0.043,
+      "error": 0.0093
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0548,
+      "datasketch": 0.0547,
+      "error": 0.0001
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0566,
+      "datasketch": 0.0508,
+      "error": 0.0058
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.055,
+      "datasketch": 0.0547,
+      "error": 0.0003
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0559,
+      "datasketch": 0.0781,
+      "error": 0.0222
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1623,
+      "datasketch": 0.1797,
+      "error": 0.0174
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0551,
+      "datasketch": 0.0469,
+      "error": 0.0082
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0539,
+      "datasketch": 0.082,
+      "error": 0.0282
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0571,
+      "datasketch": 0.043,
+      "error": 0.0141
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0549,
+      "datasketch": 0.0742,
+      "error": 0.0193
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0544,
+      "datasketch": 0.0664,
+      "error": 0.012
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1611,
+      "datasketch": 0.1836,
+      "error": 0.0225
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0547,
+      "datasketch": 0.0352,
+      "error": 0.0196
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0559,
+      "datasketch": 0.0547,
+      "error": 0.0012
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0565,
+      "datasketch": 0.0625,
+      "error": 0.006
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0554,
+      "datasketch": 0.1016,
+      "error": 0.0462
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0545,
+      "datasketch": 0.0547,
+      "error": 0.0002
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1614,
+      "datasketch": 0.1758,
+      "error": 0.0144
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0555,
+      "datasketch": 0.0352,
+      "error": 0.0203
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0565,
+      "datasketch": 0.0469,
+      "error": 0.0097
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0573,
+      "datasketch": 0.0781,
+      "error": 0.0209
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0547,
+      "datasketch": 0.0859,
+      "error": 0.0312
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0549,
+      "datasketch": 0.0625,
+      "error": 0.0076
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1633,
+      "datasketch": 0.1836,
+      "error": 0.0203
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0542,
+      "datasketch": 0.0391,
+      "error": 0.0151
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0551,
+      "datasketch": 0.0547,
+      "error": 0.0004
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.055,
+      "datasketch": 0.0234,
+      "error": 0.0316
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0538,
+      "datasketch": 0.0781,
+      "error": 0.0244
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0542,
+      "datasketch": 0.0664,
+      "error": 0.0122
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1621,
+      "datasketch": 0.2109,
+      "error": 0.0489
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0544,
+      "datasketch": 0.0547,
+      "error": 0.0003
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0551,
+      "datasketch": 0.043,
+      "error": 0.0121
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0566,
+      "datasketch": 0.0391,
+      "error": 0.0175
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.055,
+      "datasketch": 0.0742,
+      "error": 0.0192
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0528,
+      "datasketch": 0.0625,
+      "error": 0.0097
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1633,
+      "datasketch": 0.1914,
+      "error": 0.0281
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0552,
+      "datasketch": 0.043,
+      "error": 0.0122
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0554,
+      "datasketch": 0.0625,
+      "error": 0.0071
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0572,
+      "datasketch": 0.0547,
+      "error": 0.0025
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0547,
+      "datasketch": 0.0742,
+      "error": 0.0195
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0545,
+      "datasketch": 0.0625,
+      "error": 0.008
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1626,
+      "datasketch": 0.1953,
+      "error": 0.0327
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0537,
+      "datasketch": 0.043,
+      "error": 0.0107
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0544,
+      "datasketch": 0.0469,
+      "error": 0.0076
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0569,
+      "datasketch": 0.0391,
+      "error": 0.0179
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0537,
+      "datasketch": 0.082,
+      "error": 0.0284
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0539,
+      "datasketch": 0.0547,
+      "error": 0.0008
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1615,
+      "datasketch": 0.1641,
+      "error": 0.0026
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0553,
+      "datasketch": 0.0508,
+      "error": 0.0045
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0556,
+      "datasketch": 0.0508,
+      "error": 0.0048
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0557,
+      "datasketch": 0.0586,
+      "error": 0.0029
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0549,
+      "datasketch": 0.0859,
+      "error": 0.0311
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0539,
+      "datasketch": 0.0625,
+      "error": 0.0086
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1624,
+      "datasketch": 0.1836,
+      "error": 0.0212
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0542,
+      "datasketch": 0.0273,
+      "error": 0.0269
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0542,
+      "datasketch": 0.0391,
+      "error": 0.0151
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0552,
+      "datasketch": 0.043,
+      "error": 0.0123
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0552,
+      "datasketch": 0.0703,
+      "error": 0.0151
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0532,
+      "datasketch": 0.0664,
+      "error": 0.0132
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1627,
+      "datasketch": 0.2031,
+      "error": 0.0404
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0538,
+      "datasketch": 0.0352,
+      "error": 0.0186
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0531,
+      "datasketch": 0.0664,
+      "error": 0.0133
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0565,
+      "datasketch": 0.0508,
+      "error": 0.0057
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0555,
+      "datasketch": 0.0742,
+      "error": 0.0187
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0542,
+      "datasketch": 0.0664,
+      "error": 0.0122
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1621,
+      "datasketch": 0.168,
+      "error": 0.0059
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0551,
+      "datasketch": 0.0312,
+      "error": 0.0238
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0554,
+      "datasketch": 0.0703,
+      "error": 0.0149
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0571,
+      "datasketch": 0.0508,
+      "error": 0.0063
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.055,
+      "datasketch": 0.0742,
+      "error": 0.0193
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0547,
+      "datasketch": 0.0625,
+      "error": 0.0078
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.162,
+      "datasketch": 0.1758,
+      "error": 0.0138
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.054,
+      "datasketch": 0.0469,
+      "error": 0.0071
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0546,
+      "datasketch": 0.043,
+      "error": 0.0116
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0567,
+      "datasketch": 0.043,
+      "error": 0.0137
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0552,
+      "datasketch": 0.082,
+      "error": 0.0268
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0534,
+      "datasketch": 0.0703,
+      "error": 0.0169
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1609,
+      "datasketch": 0.1641,
+      "error": 0.0032
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0558,
+      "datasketch": 0.0391,
+      "error": 0.0167
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0548,
+      "datasketch": 0.0586,
+      "error": 0.0037
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0562,
+      "datasketch": 0.0625,
+      "error": 0.0063
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0557,
+      "datasketch": 0.0586,
+      "error": 0.0029
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0546,
+      "datasketch": 0.0469,
+      "error": 0.0078
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1617,
+      "datasketch": 0.1914,
+      "error": 0.0297
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0544,
+      "datasketch": 0.0195,
+      "error": 0.0348
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0553,
+      "datasketch": 0.0703,
+      "error": 0.015
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0577,
+      "datasketch": 0.043,
+      "error": 0.0148
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0544,
+      "datasketch": 0.0742,
+      "error": 0.0198
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0548,
+      "datasketch": 0.043,
+      "error": 0.0118
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1623,
+      "datasketch": 0.1797,
+      "error": 0.0174
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0543,
+      "datasketch": 0.0273,
+      "error": 0.027
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0557,
+      "datasketch": 0.0391,
+      "error": 0.0167
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0574,
+      "datasketch": 0.0312,
+      "error": 0.0261
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0545,
+      "datasketch": 0.0742,
+      "error": 0.0197
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0532,
+      "datasketch": 0.0781,
+      "error": 0.0249
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.164,
+      "datasketch": 0.1758,
+      "error": 0.0117
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0548,
+      "datasketch": 0.0352,
+      "error": 0.0196
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0557,
+      "datasketch": 0.0508,
+      "error": 0.0049
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0568,
+      "datasketch": 0.0312,
+      "error": 0.0256
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0557,
+      "datasketch": 0.0781,
+      "error": 0.0224
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.054,
+      "datasketch": 0.0742,
+      "error": 0.0202
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.162,
+      "datasketch": 0.1797,
+      "error": 0.0177
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.054,
+      "datasketch": 0.0234,
+      "error": 0.0306
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0555,
+      "datasketch": 0.0664,
+      "error": 0.0109
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0555,
+      "datasketch": 0.0391,
+      "error": 0.0164
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0555,
+      "datasketch": 0.082,
+      "error": 0.0265
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0537,
+      "datasketch": 0.0781,
+      "error": 0.0245
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1626,
+      "datasketch": 0.2148,
+      "error": 0.0522
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0542,
+      "datasketch": 0.0273,
+      "error": 0.0268
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0557,
+      "datasketch": 0.0586,
+      "error": 0.0029
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0566,
+      "datasketch": 0.0508,
+      "error": 0.0058
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0549,
+      "datasketch": 0.0664,
+      "error": 0.0115
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0548,
+      "datasketch": 0.0703,
+      "error": 0.0155
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1621,
+      "datasketch": 0.1797,
+      "error": 0.0176
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0544,
+      "datasketch": 0.0234,
+      "error": 0.031
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0547,
+      "datasketch": 0.043,
+      "error": 0.0117
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0565,
+      "datasketch": 0.0508,
+      "error": 0.0057
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0544,
+      "datasketch": 0.0977,
+      "error": 0.0432
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0542,
+      "datasketch": 0.0625,
+      "error": 0.0083
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1618,
+      "datasketch": 0.1758,
+      "error": 0.0139
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0547,
+      "datasketch": 0.0508,
+      "error": 0.0039
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0551,
+      "datasketch": 0.0508,
+      "error": 0.0043
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0547,
+      "datasketch": 0.0469,
+      "error": 0.0078
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0557,
+      "datasketch": 0.0742,
+      "error": 0.0185
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.054,
+      "datasketch": 0.0391,
+      "error": 0.015
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1627,
+      "datasketch": 0.1914,
+      "error": 0.0287
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0545,
+      "datasketch": 0.0352,
+      "error": 0.0193
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0554,
+      "datasketch": 0.0664,
+      "error": 0.011
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.056,
+      "datasketch": 0.0664,
+      "error": 0.0104
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.056,
+      "datasketch": 0.0664,
+      "error": 0.0104
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0547,
+      "datasketch": 0.0508,
+      "error": 0.0039
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1616,
+      "datasketch": 0.1836,
+      "error": 0.022
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0546,
+      "datasketch": 0.0469,
+      "error": 0.0077
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0554,
+      "datasketch": 0.043,
+      "error": 0.0124
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0572,
+      "datasketch": 0.0625,
+      "error": 0.0053
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0553,
+      "datasketch": 0.0859,
+      "error": 0.0306
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0545,
+      "datasketch": 0.0781,
+      "error": 0.0236
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1627,
+      "datasketch": 0.2227,
+      "error": 0.0599
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0542,
+      "datasketch": 0.0391,
+      "error": 0.0151
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0541,
+      "datasketch": 0.0508,
+      "error": 0.0033
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0557,
+      "datasketch": 0.0469,
+      "error": 0.0089
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.054,
+      "datasketch": 0.0938,
+      "error": 0.0397
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0549,
+      "datasketch": 0.0547,
+      "error": 0.0002
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1632,
+      "datasketch": 0.1797,
+      "error": 0.0165
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.055,
+      "datasketch": 0.043,
+      "error": 0.012
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0543,
+      "datasketch": 0.0508,
+      "error": 0.0035
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0562,
+      "datasketch": 0.0391,
+      "error": 0.0172
+    }
+  ]
+}

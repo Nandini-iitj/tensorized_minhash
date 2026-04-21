@@ -27,6 +27,7 @@ sys.path.insert(0, str(_REPO_ROOT)) # -> from tensorized_minhash.X import
 sys.path.insert(0, str(_GENOME))    # -> from kmer_builder import
 
 from demo.genome.kmer_builder import kmers_to_tensor, read_fasta, sequence_to_kmers # noqa: E402
+
 from log_setup import setup_logging # noqa: E402
 
 setup_logging()
@@ -59,6 +60,7 @@ SPECIES = {
     "yeast": DATA_DIR / "yeast.fasta",
 }
 
+
 def build_genome_tensors(shape: tuple) -> dict:
     """Load all FASTA files and return tensors at the given shape."""
     tensors = {}
@@ -68,13 +70,15 @@ def build_genome_tensors(shape: tuple) -> dict:
             logger.warning("FASTA not found: %s - will use synthetic tensor", path)
             fasta_missing.append(name)
             continue
-        
         header, seq = read_fasta(str(path))
         kmers = sequence_to_kmers(seq, k=K_MER_SIZE)
         tensors[name] = kmers_to_tensor(kmers, shape=shape)
         logger.info(
             "Built tensor for %s: %d k-mers -> shape %s density=%.3f",
-            name, len(kmers), shape, tensors[name].mean(),
+            name,
+            len(kmers),
+            shape, 
+            tensors[name].mean(),
         )
 
     # Fill missing species with synthetic random tensors at ~0.15 density
@@ -84,6 +88,7 @@ def build_genome_tensors(shape: tuple) -> dict:
         logger.warning("Synthetic tensor created for %s", name)
 
     return tensors
+
 
 def generate_pairs(tensors: dict, n_pairs: int, seed: int) -> list:
     """
@@ -99,18 +104,17 @@ def generate_pairs(tensors: dict, n_pairs: int, seed: int) -> list:
     for i in range(n_pairs):
         a_name, b_name = base_pairs[i % len(base_pairs)]
         ta = tensors[a_name].copy().astype(np.float32)
-        tb = tensors[b_name].copy().astype(np.float32)
-        
+        tb = tensors[b_name].copy().astype(np.float32)    
         # Jitter for repeated pairs to create distinct workload
         if i >= len(base_pairs):
             noise_a = (rng.random(ta.shape) < 0.03).astype(np.float32)
             noise_b = (rng.random(tb.shape) < 0.03).astype(np.float32)
             ta = np.clip(ta + noise_a - (rng.random(ta.shape) < 0.01).astype(np.float32), 0, 1)
             tb = np.clip(tb + noise_b - (rng.random(tb.shape) < 0.01).astype(np.float32), 0, 1)
-        
         pairs.append((ta, tb, a_name, b_name))
     
     return pairs
+
 
 def save_input(out_dir: Path, pairs: list, shape: tuple, level: int, seed: int):
     """Serialize tensor pairs and manifest to out_dir."""
@@ -134,12 +138,12 @@ def save_input(out_dir: Path, pairs: list, shape: tuple, level: int, seed: int):
         "seed": seed,
         "pair_labels": labels,
     }
-
     with open(out_dir / "input_manifest.json", "w") as f:
         json.dump(manifest, f, indent=2)
 
     size_mb = (a_stack.nbytes + b_stack.nbytes) / 1024 / 1024
     logger.info("Saved %d pairs -> %s (%.1f MB total)", len(pairs), out_dir, size_mb)
+
 
 def main():
     parser = argparse.ArgumentParser(description="Generate racing-track tensor input")

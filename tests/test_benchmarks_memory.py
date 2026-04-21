@@ -5,8 +5,8 @@ Covers benchmark_memory, benchmark_ram, ground_truth_jaccard,
 and datasketch_jaccard (including the branch for non-binary tensors).
 """
 
-from benchmark import datasketch_jaccard, ground_truth_jaccard
-from benchmark import benchmark_memory, benchmark_ram
+from benchmarks import datasketch_jaccard, ground_truth_jaccard
+from benchmarks import benchmark_memory, benchmark_ram
 import numpy as np
 
 # --------------------------------------------------------------------------

@@ -37,7 +37,7 @@ def exact_jaccard(a: np.ndarray, b: np.ndarray) -> float:
     bb = b.astype(bool)
     inter = int(np.sum(ab & bb))
     union = int(np.sum(ab | bb))
-    return float(inter / union) if union > 0 else 0.0
+    return inter / union if union > 0 else 0.0
 
 def main():
     # Load manifest

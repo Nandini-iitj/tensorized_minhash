@@ -2,7 +2,7 @@ version: "3.9"
 
 x-worker-defaults: &worker-defaults
   restart: "no"
-  mem_limit: 2g
+  mem_limit: 4g
   cpus: 2.0
   environment:
     SHARED_INPUT_DIR: /shared_input
@@ -23,7 +23,7 @@ services:
     container_name: racing_generate_input
     restart: "no"
     environment:
-      LOAD_LEVEL: "${LOAD_LEVEL:-7}"
+      LOAD_LEVEL: "${LOAD_LEVEL:-8}"
       OUT_DIR: /shared_input
     volumes:
       - shared_input:/shared_input
@@ -49,12 +49,12 @@ services:
       generate_input:
         condition: service_completed_successfully
 
-  worker_datasketch:
+  worker_minhash:
     <<: *worker-defaults
     build:
       context: ../..
       dockerfile: demo/racing/worker_datasketch/Dockerfile
-    container_name: racing_worker_datasketch
+    container_name: racing_worker_minhash
     depends_on:
       generate_input:
         condition: service_completed_successfully

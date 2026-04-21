@@ -2,7 +2,7 @@ version: "3.9"
 
 x-worker-defaults: &worker-defaults
   restart: "no"
-  mem_limit: 4g
+  mem_limit: 6g
   cpus: 2.0
   environment:
     SHARED_INPUT_DIR: /shared_input

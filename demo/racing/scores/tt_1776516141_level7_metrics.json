@@ -1,0 +1,1518 @@
+{
+  "algo": "tt",
+  "load_level": 7,
+  "shape": [
+    70,
+    70,
+    70
+  ],
+  "n_pairs": 250,
+  "num_hashes": 256,
+  "elapsed_s": 654.199,
+  "mae": 0.0144,
+  "max_error": 0.0527,
+  "memory_kb": 1680,
+  "timestamp": 1776516141,
+  "pairs": [
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.2501,
+      "tt": 0.2227,
+      "error": 0.0275
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0514,
+      "tt": 0.0742,
+      "error": 0.0228
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0371,
+      "tt": 0.0234,
+      "error": 0.0136
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0539,
+      "tt": 0.0508,
+      "error": 0.0031
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0371,
+      "tt": 0.0312,
+      "error": 0.0058
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0358,
+      "tt": 0.0156,
+      "error": 0.0202
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1627,
+      "tt": 0.1523,
+      "error": 0.0103
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.055,
+      "tt": 0.0469,
+      "error": 0.0081
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0558,
+      "tt": 0.0547,
+      "error": 0.0011
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0562,
+      "tt": 0.0742,
+      "error": 0.0181
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0545,
+      "tt": 0.0508,
+      "error": 0.0038
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0542,
+      "tt": 0.0586,
+      "error": 0.0044
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1605,
+      "tt": 0.125,
+      "error": 0.0355
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0537,
+      "tt": 0.082,
+      "error": 0.0284
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0545,
+      "tt": 0.043,
+      "error": 0.0116
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0562,
+      "tt": 0.043,
+      "error": 0.0133
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0557,
+      "tt": 0.0508,
+      "error": 0.0049
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0536,
+      "tt": 0.0312,
+      "error": 0.0224
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1636,
+      "tt": 0.1133,
+      "error": 0.0504
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0547,
+      "tt": 0.082,
+      "error": 0.0274
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0556,
+      "tt": 0.0352,
+      "error": 0.0204
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0559,
+      "tt": 0.0547,
+      "error": 0.0012
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0548,
+      "tt": 0.0625,
+      "error": 0.0077
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0537,
+      "tt": 0.0352,
+      "error": 0.0185
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1621,
+      "tt": 0.1172,
+      "error": 0.045
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0541,
+      "tt": 0.0586,
+      "error": 0.0045
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0567,
+      "tt": 0.0469,
+      "error": 0.0098
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0564,
+      "tt": 0.0625,
+      "error": 0.0061
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0551,
+      "tt": 0.0625,
+      "error": 0.0074
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0538,
+      "tt": 0.0195,
+      "error": 0.0343
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1625,
+      "tt": 0.1445,
+      "error": 0.018
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0533,
+      "tt": 0.0586,
+      "error": 0.0053
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0549,
+      "tt": 0.0508,
+      "error": 0.0041
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.056,
+      "tt": 0.0625,
+      "error": 0.0065
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0556,
+      "tt": 0.0625,
+      "error": 0.0069
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0543,
+      "tt": 0.0312,
+      "error": 0.023
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1624,
+      "tt": 0.1328,
+      "error": 0.0296
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0563,
+      "tt": 0.0312,
+      "error": 0.025
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0553,
+      "tt": 0.0547,
+      "error": 0.0006
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0557,
+      "tt": 0.0391,
+      "error": 0.0166
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0546,
+      "tt": 0.0469,
+      "error": 0.0078
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0545,
+      "tt": 0.0352,
+      "error": 0.0194
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1625,
+      "tt": 0.125,
+      "error": 0.0375
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0553,
+      "tt": 0.0586,
+      "error": 0.0033
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0562,
+      "tt": 0.0352,
+      "error": 0.021
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0556,
+      "tt": 0.0312,
+      "error": 0.0243
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.054,
+      "tt": 0.043,
+      "error": 0.011
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0543,
+      "tt": 0.0508,
+      "error": 0.0035
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.162,
+      "tt": 0.1445,
+      "error": 0.0174
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0551,
+      "tt": 0.0781,
+      "error": 0.0231
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0557,
+      "tt": 0.043,
+      "error": 0.0127
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0555,
+      "tt": 0.043,
+      "error": 0.0125
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0553,
+      "tt": 0.0625,
+      "error": 0.0072
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0551,
+      "tt": 0.0547,
+      "error": 0.0005
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.163,
+      "tt": 0.125,
+      "error": 0.038
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0549,
+      "tt": 0.0547,
+      "error": 0.0002
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0552,
+      "tt": 0.043,
+      "error": 0.0122
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0563,
+      "tt": 0.043,
+      "error": 0.0133
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0545,
+      "tt": 0.043,
+      "error": 0.0115
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0546,
+      "tt": 0.0312,
+      "error": 0.0234
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1626,
+      "tt": 0.1289,
+      "error": 0.0337
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0549,
+      "tt": 0.0586,
+      "error": 0.0037
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0555,
+      "tt": 0.0469,
+      "error": 0.0087
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0564,
+      "tt": 0.0508,
+      "error": 0.0056
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0545,
+      "tt": 0.0586,
+      "error": 0.0041
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0552,
+      "tt": 0.0469,
+      "error": 0.0084
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.162,
+      "tt": 0.1484,
+      "error": 0.0135
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0549,
+      "tt": 0.0586,
+      "error": 0.0037
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0551,
+      "tt": 0.0312,
+      "error": 0.0239
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0559,
+      "tt": 0.043,
+      "error": 0.0129
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0555,
+      "tt": 0.0508,
+      "error": 0.0048
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0543,
+      "tt": 0.0234,
+      "error": 0.0309
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1622,
+      "tt": 0.1289,
+      "error": 0.0333
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0545,
+      "tt": 0.0742,
+      "error": 0.0197
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0553,
+      "tt": 0.0352,
+      "error": 0.0202
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0574,
+      "tt": 0.0273,
+      "error": 0.0301
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0546,
+      "tt": 0.0469,
+      "error": 0.0078
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0539,
+      "tt": 0.0469,
+      "error": 0.007
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1627,
+      "tt": 0.1445,
+      "error": 0.0182
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0558,
+      "tt": 0.0781,
+      "error": 0.0223
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0552,
+      "tt": 0.0469,
+      "error": 0.0083
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0555,
+      "tt": 0.0508,
+      "error": 0.0047
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0547,
+      "tt": 0.0586,
+      "error": 0.0039
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0545,
+      "tt": 0.0352,
+      "error": 0.0194
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1622,
+      "tt": 0.1445,
+      "error": 0.0177
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0543,
+      "tt": 0.0469,
+      "error": 0.0075
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0549,
+      "tt": 0.043,
+      "error": 0.012
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0578,
+      "tt": 0.0742,
+      "error": 0.0165
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0545,
+      "tt": 0.0781,
+      "error": 0.0236
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0541,
+      "tt": 0.043,
+      "error": 0.0111
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1611,
+      "tt": 0.1367,
+      "error": 0.0244
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0545,
+      "tt": 0.0391,
+      "error": 0.0154
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0543,
+      "tt": 0.0547,
+      "error": 0.0004
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0573,
+      "tt": 0.0625,
+      "error": 0.0052
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0556,
+      "tt": 0.0703,
+      "error": 0.0147
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0542,
+      "tt": 0.0352,
+      "error": 0.019
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1622,
+      "tt": 0.1445,
+      "error": 0.0177
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0538,
+      "tt": 0.0703,
+      "error": 0.0166
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.055,
+      "tt": 0.043,
+      "error": 0.0121
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0564,
+      "tt": 0.0586,
+      "error": 0.0022
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0561,
+      "tt": 0.0703,
+      "error": 0.0142
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.054,
+      "tt": 0.0391,
+      "error": 0.0149
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1617,
+      "tt": 0.1445,
+      "error": 0.0172
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0523,
+      "tt": 0.0742,
+      "error": 0.0219
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0548,
+      "tt": 0.0312,
+      "error": 0.0236
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0566,
+      "tt": 0.0742,
+      "error": 0.0177
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.055,
+      "tt": 0.043,
+      "error": 0.012
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0559,
+      "tt": 0.043,
+      "error": 0.0129
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1623,
+      "tt": 0.1445,
+      "error": 0.0177
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0551,
+      "tt": 0.0508,
+      "error": 0.0043
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0539,
+      "tt": 0.0391,
+      "error": 0.0148
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0571,
+      "tt": 0.0508,
+      "error": 0.0063
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0549,
+      "tt": 0.0391,
+      "error": 0.0159
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0544,
+      "tt": 0.0391,
+      "error": 0.0153
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1611,
+      "tt": 0.1172,
+      "error": 0.0439
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0547,
+      "tt": 0.0625,
+      "error": 0.0078
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0559,
+      "tt": 0.0547,
+      "error": 0.0012
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0565,
+      "tt": 0.0586,
+      "error": 0.0021
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0554,
+      "tt": 0.0547,
+      "error": 0.0007
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0545,
+      "tt": 0.0234,
+      "error": 0.031
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1614,
+      "tt": 0.1328,
+      "error": 0.0286
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0555,
+      "tt": 0.0664,
+      "error": 0.011
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0565,
+      "tt": 0.0586,
+      "error": 0.0021
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0573,
+      "tt": 0.0742,
+      "error": 0.017
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0547,
+      "tt": 0.0508,
+      "error": 0.0039
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0549,
+      "tt": 0.043,
+      "error": 0.0119
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1633,
+      "tt": 0.1367,
+      "error": 0.0266
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0542,
+      "tt": 0.0508,
+      "error": 0.0034
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0551,
+      "tt": 0.0508,
+      "error": 0.0043
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.055,
+      "tt": 0.043,
+      "error": 0.012
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0538,
+      "tt": 0.0664,
+      "error": 0.0126
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0542,
+      "tt": 0.0273,
+      "error": 0.0269
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1621,
+      "tt": 0.1094,
+      "error": 0.0527
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0544,
+      "tt": 0.082,
+      "error": 0.0276
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0551,
+      "tt": 0.0508,
+      "error": 0.0043
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0566,
+      "tt": 0.0625,
+      "error": 0.0059
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.055,
+      "tt": 0.0547,
+      "error": 0.0003
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0528,
+      "tt": 0.0547,
+      "error": 0.0019
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1633,
+      "tt": 0.1133,
+      "error": 0.05
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0552,
+      "tt": 0.043,
+      "error": 0.0122
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0554,
+      "tt": 0.0391,
+      "error": 0.0163
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0572,
+      "tt": 0.0391,
+      "error": 0.0181
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0547,
+      "tt": 0.0664,
+      "error": 0.0117
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0545,
+      "tt": 0.0469,
+      "error": 0.0076
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1626,
+      "tt": 0.1328,
+      "error": 0.0298
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0537,
+      "tt": 0.0742,
+      "error": 0.0205
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0544,
+      "tt": 0.0391,
+      "error": 0.0154
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0569,
+      "tt": 0.0508,
+      "error": 0.0062
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0537,
+      "tt": 0.0547,
+      "error": 0.001
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0539,
+      "tt": 0.043,
+      "error": 0.0109
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1615,
+      "tt": 0.125,
+      "error": 0.0365
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0553,
+      "tt": 0.0625,
+      "error": 0.0072
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0556,
+      "tt": 0.043,
+      "error": 0.0126
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0557,
+      "tt": 0.0625,
+      "error": 0.0068
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0549,
+      "tt": 0.0547,
+      "error": 0.0002
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0539,
+      "tt": 0.0273,
+      "error": 0.0266
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1624,
+      "tt": 0.1406,
+      "error": 0.0217
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0542,
+      "tt": 0.0547,
+      "error": 0.0005
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0542,
+      "tt": 0.0391,
+      "error": 0.0151
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0552,
+      "tt": 0.0625,
+      "error": 0.0073
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0552,
+      "tt": 0.0586,
+      "error": 0.0034
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0532,
+      "tt": 0.0469,
+      "error": 0.0063
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1627,
+      "tt": 0.1367,
+      "error": 0.026
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0538,
+      "tt": 0.0469,
+      "error": 0.0069
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0531,
+      "tt": 0.0508,
+      "error": 0.0023
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0565,
+      "tt": 0.0703,
+      "error": 0.0139
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0555,
+      "tt": 0.0664,
+      "error": 0.0109
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0542,
+      "tt": 0.0352,
+      "error": 0.0191
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1621,
+      "tt": 0.1719,
+      "error": 0.0098
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0551,
+      "tt": 0.0547,
+      "error": 0.0004
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0554,
+      "tt": 0.0391,
+      "error": 0.0164
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0571,
+      "tt": 0.0586,
+      "error": 0.0015
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.055,
+      "tt": 0.0547,
+      "error": 0.0003
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0547,
+      "tt": 0.0391,
+      "error": 0.0156
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.162,
+      "tt": 0.1328,
+      "error": 0.0292
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.054,
+      "tt": 0.0586,
+      "error": 0.0046
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0546,
+      "tt": 0.0508,
+      "error": 0.0038
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0567,
+      "tt": 0.0625,
+      "error": 0.0058
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0552,
+      "tt": 0.0586,
+      "error": 0.0034
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0534,
+      "tt": 0.0312,
+      "error": 0.0221
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1609,
+      "tt": 0.1367,
+      "error": 0.0242
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0558,
+      "tt": 0.0586,
+      "error": 0.0028
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0548,
+      "tt": 0.0391,
+      "error": 0.0158
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0562,
+      "tt": 0.0625,
+      "error": 0.0063
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0557,
+      "tt": 0.0742,
+      "error": 0.0185
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0546,
+      "tt": 0.0234,
+      "error": 0.0312
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1617,
+      "tt": 0.1484,
+      "error": 0.0133
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0544,
+      "tt": 0.0508,
+      "error": 0.0036
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0553,
+      "tt": 0.0352,
+      "error": 0.0202
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0577,
+      "tt": 0.0508,
+      "error": 0.007
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0544,
+      "tt": 0.0273,
+      "error": 0.027
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0548,
+      "tt": 0.0312,
+      "error": 0.0235
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1623,
+      "tt": 0.125,
+      "error": 0.0373
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0543,
+      "tt": 0.0625,
+      "error": 0.0082
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0557,
+      "tt": 0.0273,
+      "error": 0.0284
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0574,
+      "tt": 0.0547,
+      "error": 0.0027
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0545,
+      "tt": 0.0508,
+      "error": 0.0037
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0532,
+      "tt": 0.0586,
+      "error": 0.0054
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.164,
+      "tt": 0.1367,
+      "error": 0.0273
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0548,
+      "tt": 0.0586,
+      "error": 0.0038
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0557,
+      "tt": 0.0625,
+      "error": 0.0068
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0568,
+      "tt": 0.0625,
+      "error": 0.0057
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0557,
+      "tt": 0.0469,
+      "error": 0.0088
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.054,
+      "tt": 0.0273,
+      "error": 0.0267
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.162,
+      "tt": 0.1523,
+      "error": 0.0097
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.054,
+      "tt": 0.0586,
+      "error": 0.0046
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0555,
+      "tt": 0.043,
+      "error": 0.0125
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0555,
+      "tt": 0.043,
+      "error": 0.0125
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0555,
+      "tt": 0.0664,
+      "error": 0.0109
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0537,
+      "tt": 0.0273,
+      "error": 0.0263
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1626,
+      "tt": 0.1406,
+      "error": 0.022
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0542,
+      "tt": 0.0508,
+      "error": 0.0034
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0557,
+      "tt": 0.0352,
+      "error": 0.0206
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0566,
+      "tt": 0.043,
+      "error": 0.0136
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0549,
+      "tt": 0.0469,
+      "error": 0.008
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0548,
+      "tt": 0.0391,
+      "error": 0.0157
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1621,
+      "tt": 0.1367,
+      "error": 0.0254
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0544,
+      "tt": 0.0664,
+      "error": 0.012
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0547,
+      "tt": 0.0273,
+      "error": 0.0273
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0565,
+      "tt": 0.0586,
+      "error": 0.0021
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0544,
+      "tt": 0.0508,
+      "error": 0.0037
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0542,
+      "tt": 0.0312,
+      "error": 0.023
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1618,
+      "tt": 0.1406,
+      "error": 0.0212
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0547,
+      "tt": 0.0547,
+      "error": 0.0
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0551,
+      "tt": 0.0391,
+      "error": 0.016
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0547,
+      "tt": 0.0703,
+      "error": 0.0156
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0557,
+      "tt": 0.043,
+      "error": 0.0128
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.054,
+      "tt": 0.0312,
+      "error": 0.0228
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1627,
+      "tt": 0.1758,
+      "error": 0.0131
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0545,
+      "tt": 0.0625,
+      "error": 0.008
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0554,
+      "tt": 0.0703,
+      "error": 0.0149
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.056,
+      "tt": 0.0508,
+      "error": 0.0053
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.056,
+      "tt": 0.0469,
+      "error": 0.0091
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0547,
+      "tt": 0.0312,
+      "error": 0.0234
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1616,
+      "tt": 0.1484,
+      "error": 0.0132
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0546,
+      "tt": 0.043,
+      "error": 0.0116
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0554,
+      "tt": 0.0508,
+      "error": 0.0046
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0572,
+      "tt": 0.0508,
+      "error": 0.0064
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.0553,
+      "tt": 0.0469,
+      "error": 0.0084
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0545,
+      "tt": 0.0234,
+      "error": 0.031
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1627,
+      "tt": 0.1328,
+      "error": 0.0299
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.0542,
+      "tt": 0.0664,
+      "error": 0.0122
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0541,
+      "tt": 0.0469,
+      "error": 0.0072
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0557,
+      "tt": 0.0391,
+      "error": 0.0167
+    },
+    {
+      "pair": "chimp <-> yeast",
+      "exact": 0.054,
+      "tt": 0.043,
+      "error": 0.0111
+    },
+    {
+      "pair": "mouse <-> yeast",
+      "exact": 0.0549,
+      "tt": 0.0195,
+      "error": 0.0354
+    },
+    {
+      "pair": "human <-> chimp",
+      "exact": 0.1632,
+      "tt": 0.1406,
+      "error": 0.0225
+    },
+    {
+      "pair": "human <-> mouse",
+      "exact": 0.055,
+      "tt": 0.0742,
+      "error": 0.0192
+    },
+    {
+      "pair": "human <-> yeast",
+      "exact": 0.0543,
+      "tt": 0.0625,
+      "error": 0.0082
+    },
+    {
+      "pair": "chimp <-> mouse",
+      "exact": 0.0562,
+      "tt": 0.043,
+      "error": 0.0133
+    }
+  ]
+}

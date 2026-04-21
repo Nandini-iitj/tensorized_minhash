@@ -5,7 +5,7 @@ Covers benchmark_speed, benchmark_speed_real, and benchmark_random_projection
 including both feasible and infeasible (too-large) matrix paths.
 """
 
-from benchmark import (
+from benchmarks import (
     benchmark_random_projection,
     benchmark_speed,
     benchmark_speed_real,

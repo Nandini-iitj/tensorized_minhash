@@ -88,7 +88,7 @@ The additive exponential rank `Σ Exp(1)_mode` is used instead of a product of U
 
 1. The sum of independent Exp(1) r.v.s forms an Erlang distribution — well-spread, no collapse near zero
 2. The Kronecker MinHash approximation satisfies `E[h_j(A)==h_j(B)] ≈ J(A,B)` (validated empirically: MAE < 0.04, Pearson r > 0.85)
-3. The approximation is unbiased in the limit of large tensor modes — independence of the mode-wise factors introduces only a small correlation penalty that vanishes as `d_mode → ∞`
+3. The approximation is unbiased in the limit of large tensor modes — independence of the mode-wise factors introduces only a small correlation penalty that vanishes as `d_mode -> ∞`
 
 ### Tensor Train (TT) Alternative
 
@@ -167,7 +167,7 @@ from data.loader import NetworkTensorBuilder
 builder = NetworkTensorBuilder(n_src=200, n_dst=200, n_port=100)
 df = builder.load_cic_ids2017("path/to/Friday-WorkingHours-Afternoon-DDos.pcap_ISCX.csv")
 tensor = builder.build_tensor(df)
-# → shape: (200, 200, 100), binary
+# -> shape: (200, 200, 100), binary
 ```
 
 Download the dataset at: https://www.unb.ca/cic/datasets/ids-2017.html

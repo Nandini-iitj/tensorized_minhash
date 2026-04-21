@@ -1,6 +1,10 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
+*__pycache__/
+*__pycache__*
 *.py[cod]
+*.pyc
+*.pyd
 *$py.class
 
 # C extensions
@@ -48,6 +52,7 @@ coverage.xml
 *.py,cover
 .hypothesis/
 .pytest_cache/
+.ruff_cache/
 cover/
 
 # Translations

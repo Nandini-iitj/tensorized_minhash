@@ -120,8 +120,8 @@ def _generate_high_similarity_pair(
     flip_a = rng.choice(base_cells, n_flip, replace=False)
     flip_b = rng.choice(base_cells, n_flip, replace=False)
 
-    set_a = set(base_cells) | set(flip_a) - set(flip_b)
-    set_b = set(base_cells) | set(flip_b) - set(flip_a)
+    set_a = (set(base_cells) | set(flip_a)) - set(flip_b)
+    set_b = (set(base_cells) | set(flip_b)) - set(flip_a)
 
     a = np.zeros(shape, dtype=np.float32)
     a.ravel()[list(set_a)] = 1.0
@@ -309,8 +309,8 @@ def benchmark_accuracy_from_tensors(
     all_pairs = [(i, j) for i in range(n_windows) for j in range(i + 1, n_windows)]
 
     if len(all_pairs) > n_pairs:
-        sampled_indices = rng.choice(len(all_pairs), size=n_pairs, replace=False)
-        pairs = [all_pairs[k] for k in sampled_indices]
+        sampled = rng.choice(len(all_pairs), size=n_pairs, replace=False)
+        pairs = [all_pairs[k] for k in sampled]
     else:
         pairs = all_pairs
 

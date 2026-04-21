@@ -1,1 +1,5 @@
-python -m pip install pandas numpy scikit-learn pyspark tqdm
+pandas
+numpy
+scikit-learn
+pyspark
+tqdm

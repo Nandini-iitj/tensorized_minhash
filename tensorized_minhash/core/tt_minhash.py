@@ -1,20 +1,16 @@
-# TTDecomposedMinHash - Tensor Train decomposed MinHash.
-
 """
-Stores num_hashes independent TT decompositions, each with standard boundary
-ranks (r_0 = r_d = 1) and inner bond dimension tt_rank.
+TTDecomposedMinHash - Tensor Train decomposed MinHash.
+
+Stores num_hashes independent TT decompositions, each with standard
+boundary ranks (r_0 = r_d = 1) and inner bond dimension tt_rank.
 Core shapes: (1, n_0, r), (r, n_1, r), ..., (r, n_{d-1}, 1).
 
 For each hash function j and nonzero cell (i_0, ..., i_{d-1}), the rank is:
-    rank_j(i_0, ..., i_{d-1}) = g_0[i_0, i_1, ..., i_{d-1}] · g_1[i_1, ..., i_{d-1}],
-where g_0 and g_1 are functions that map indices to ranks. The default values
-for g_0 and g_1 are:
-    g_0[i_0, i_1, ..., i_{d-1}] = 1,
-    g_1[i_1, ..., i_{d-1}] = 1.
+    rank_j(i_0, ..., i_{d-1}) = G_0[0, i_0, :] @ G_1[:, i_1, :] @ ... @ G_{d-1}[:, i_{d-1}, 0]
 
-This is a scalar. With random Gaussian cores, these scalars approximate i.i.d.
-random variables, so argmin over nonzero cells preserves Jaccard:
-    Pr[argmin_i(A) rank_j == argmin_i(B) rank_j] = 3/4
+This is a scalar. With random Gaussian cores, these scalars approximate
+i.i.d. random variables, so argmin over nonzero cells preserves Jaccard:
+    Pr[argmin_{A} rank_j == argmin_{B} rank_j] ≈ J(A, B)
 
 Memory: num_hashes * d * n * r^2 - linear in all dimensions, compared to
 O(n^d * k) for the full matrix. More expressive than Kronecker (which uses
@@ -36,7 +32,7 @@ class TTDecomposedMinHash:
     """MinHash using Tensor Train (TT) decomposed hash functions."""
 
     def __init__(self, config: TTMinHashConfig):
-        self.config = config
+        self.cfg = config
         rng = np.random.default_rng(config.seed + 1)
         r = config.tt_rank
         ndim = config.ndim
@@ -48,15 +44,17 @@ class TTDecomposedMinHash:
 
         for _ in range(config.num_hashes):
             cores: list[np.ndarray] = []
-            for mode, n_k in enumerate(config.shape):
-                r_left = 1 if mode == 0 else r
-                r_right = 1 if mode == ndim - 1 else r
+            for k_mode, n_k in enumerate(config.shape):
+                r_left = 1 if k_mode == 0 else r
+                r_right = 1 if k_mode == ndim - 1 else r
                 core = rng.standard_normal((r_left, n_k, r_right)).astype(np.float32)
-                # Left-orthogonalize for numerical stability
+                
+                # Left-orthogonalise for numerical stability
                 core_mat = core.reshape(r_left * n_k, r_right)
                 if r_left * n_k >= r_right:
                     core_mat, _ = np.linalg.qr(core_mat)
                     core = core_mat[:, :r_right].reshape(r_left, n_k, r_right)
+                
                 cores.append(core)
             self.all_cores.append(cores)
 
@@ -71,17 +69,17 @@ class TTDecomposedMinHash:
         of every nonzero cell to produce a scalar rank. The MinHash value is
         the flat index of the cell with the minimum rank.
 
-        Vectorized over cells within each hash function j.
+        Vectorised over cells within each hash function j.
         Returns: signature of shape (num_hashes,) - integer hash values.
         """
-        assert tensor.shape == self.config.shape, f"Expected {self.config.shape}, got {tensor.shape}"
+        assert tensor.shape == self.cfg.shape, f"Expected {self.cfg.shape}, got {tensor.shape}"
 
         nonzero_idx = np.argwhere(tensor > 0)  # (nnz, ndim)
         if len(nonzero_idx) == 0:
-            return np.zeros(self.config.num_hashes, dtype=np.int32)
+            return np.zeros(self.cfg.num_hashes, dtype=np.int32)
 
         nnz = len(nonzero_idx)
-        signature = np.empty(self.config.num_hashes, dtype=np.int32)
+        signature = np.empty(self.cfg.num_hashes, dtype=np.int32)
 
         for j, cores in enumerate(self.all_cores):
             # state: (nnz, r_current) - left boundary rank is 1
@@ -100,12 +98,12 @@ class TTDecomposedMinHash:
             ranks = state[:, 0]  # (nnz,)
             min_cell = int(np.argmin(ranks))
             multi_idx = nonzero_idx[min_cell]
-            signature[j] = int(np.ravel_multi_index(multi_idx, self.config.shape))
+            signature[j] = int(np.ravel_multi_index(multi_idx, self.cfg.shape))
 
         return signature
 
     def jaccard_from_signatures(self, sig_a: np.ndarray, sig_b: np.ndarray) -> float:
-        """Estimate Jaccard similarity. J(A,B) = #(sig_a == sig_b) / k"""
+        """Estimate Jaccard similarity. J(A,B) ≈ #(sig_a == sig_b) / k"""
         return float(np.mean(sig_a == sig_b))
 
     def memory_stats(self) -> dict[str, int]:

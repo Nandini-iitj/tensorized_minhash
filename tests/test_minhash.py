@@ -227,7 +227,7 @@ class TestTTMinHash:
         """TT hasher on an all-zero tensor must return a zero signature."""
         t = np.zeros(self.shape, dtype=np.float32)
         sig = self.hasher.hash_tensor(t)
-        assert sig.shape == self.hasher.cfg.num_hashes, (sig.shape, self.hasher.cfg.num_hashes)
+        assert sig.shape == (self.cfg.num_hashes,)
         np.testing.assert_array_equal(sig, 0)
 
     def test_memory_stats_keys_tt(self):

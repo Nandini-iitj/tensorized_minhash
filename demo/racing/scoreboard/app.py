@@ -2,10 +2,10 @@
 app.py - Racing Scoreboard (Streamlit + Docker SDK)
 
 Reads everything from outside the containers:
- • CPU% / RAM  → container.stats(stream=False)
- • Progress    → container.logs(tail=20) - workers print "PROGRESS: x/total"
- • Start time  → container.attrs['State']['StartedAt']
- • Metrics     → reads JSON files from /scores/ volume
+ • CPU% / RAM  -> container.stats(stream=False)
+ • Progress    -> container.logs(tail=20) - workers print "PROGRESS: x/total"
+ • Start time  -> container.attrs['State']['StartedAt']
+ • Metrics     -> reads JSON files from /scores/ volume
 
 Run:
     streamlit run app.py --server.port 8501
@@ -28,14 +28,21 @@ import streamlit as st
 SCORES_DIR = Path(os.environ.get("SCORES_DIR", "/scores"))
 
 ALGO_COLORS = {
-    "kron": " #4e79a7",
-    "tt": " #f28e2b",
-    "datasketch": " #e15759",
+    "kron": " #4e79a7",   # blue
+    "tt": " #f28e2b",   # orange
+    "minhash": " #e15759",   # red
 }
 
-REFRESH_MS = 1500
-MAX_HISTORY = 60  # data points kept in session for sparklines
+ALGO_LABELS = {
+    "kron": "Kronecker",
+    "tt": "Tensor Train",
+    "minhash": "Minhash (dense)",
+}
 
+CONTAINER_NAMES = {
+    "event1": ["racing_worker_kron", "racing_worker_tt", "racing_worker_minhash"],
+    "event2": ["racing_worker_kron", "racing_worker_tt"]
+}
 
 # -----------------------------------------------------------------------------
 # Docker helpers

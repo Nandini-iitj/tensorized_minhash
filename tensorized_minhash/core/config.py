@@ -41,7 +41,7 @@ class TTMinHashConfig:
 
         logger.info(
             f"TTMinHashConfig: shape={shape}, k={num_hashes}, "
-            f"full={full_params}, kron={kron_params}, "
+            f"full={full_params:,}, kron={kron_params:,}, "
             f"(kron: {self.kron_compression_ratio:.1f}x), "
-            f"tt={tt_params}, (tt: {self.tt_compression_ratio:.1f}x)"
+            f"tt={tt_params:,}, (tt: {self.tt_compression_ratio:.1f}x)"
         )

@@ -109,7 +109,7 @@ def _fmt(j: float) -> str:
     bar_len = int(j * 30)
     bar = "█" * bar_len + "░" * (30 - bar_len)
     label = "HIGH" if j > 0.5 else ("MED " if j > 0.2 else "LOW ")
-    return f"{j:.4f} [{bar}] {label}"
+    return f"{j:.4f}  [{bar}]  {label}"
 
 
 def _col(w: int, s: str) -> str:
@@ -133,9 +133,8 @@ def _download_fasta(name: str, dest: Path, accession: str) -> None:
 
 
 def main():
-    #
-    # 1. Load + build tensors
-    #
+
+    # Load + build tensors
     print("\n" + "=" * 72)
     print(" Human vs Animals - MinHash on Mitochondrial Genomes")
     print("=" * 72)
@@ -148,8 +147,8 @@ def main():
     ]
     if to_download:
         print(f"\n Downloading {len(to_download)} missing FASTA file(s) from NCBI...")
-        for name, _dest, _acc in to_download:
-            _download_fasta(name, _dest, _acc)
+        for _name, _dest, _acc in to_download:
+            _download_fasta(_name, _dest, _acc)
         print()
 
     tensors: dict[str, np.ndarray] = {}
@@ -160,13 +159,12 @@ def main():
         kmer_counts[name] = len(kmers)
         tensors[name] = kmers_to_tensor(kmers, shape=TENSOR_SHAPE)
         print(
-            f"  {name:10s}: ({len(seq):>7,}) bp  →  {len(kmers):>6,} unique {K_MER_SIZE}-mers  "
-            f"→ tensor density {tensors[name].mean():.3f}"
+            f"  {name:10s}: ({len(seq):>7,}) bp  ->  {len(kmers):>6,} unique {K_MER_SIZE}-mers  "
+            f"-> tensor density {tensors[name].mean():.3f}"
         )
 
-    #
-    # 2. Set up hashers
-    #
+    # Set up hashers
+    
     cfg = TTMinHashConfig(shape=TENSOR_SHAPE, num_hashes=NUM_HASHES, seed=SEED)
     kron_h = KroneckerMinHash(cfg)
     tt_h = TTDecomposedMinHash(cfg)
@@ -177,7 +175,7 @@ def main():
     print(f"  Kronecker : {mem_kron['kron_bytes'] / 1024:.1f} KB")
     print(f"  TT        : {mem_tt['tt_bytes'] / 1024:.1f} KB")
 
-    print(" Computing signatures...", end=" ", flush=True)
+    print("\n Computing signatures...", end=" ", flush=True)
     sigs_kron: dict[str, np.ndarray] = {}
     sigs_tt: dict[str, np.ndarray] = {}
     for name, tensor in tensors.items():
