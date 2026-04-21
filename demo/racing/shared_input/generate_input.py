@@ -26,7 +26,7 @@ _REPO_ROOT = _DEMO_ROOT.parent # repo root
 sys.path.insert(0, str(_REPO_ROOT)) # -> from tensorized_minhash.X import
 sys.path.insert(0, str(_GENOME))    # -> from kmer_builder import
 
-from demo.genome.kmer_builder import kmers_to_tensor, read_fasta, sequence_to_kmers # noqa: E402
+from kmer_builder import kmers_to_tensor, read_fasta, sequence_to_kmers # noqa: E402
 
 from log_setup import setup_logging # noqa: E402
 

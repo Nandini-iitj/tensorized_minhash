@@ -3,7 +3,7 @@ version: "3.9"
 x-worker-defaults: &worker-defaults
   restart: "no"
   mem_limit: 6g
-  cpus: 2.0
+  cpus: 4.0
   environment:
     SHARED_INPUT_DIR: /shared_input
     SCORES_DIR: /scores

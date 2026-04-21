@@ -57,6 +57,7 @@ LEVEL_INFO = {
 
 POLL_S   = 1.5   # seconds between live refreshes
 MAX_PTS  = 300   # max time-series points retained per algo
+SHARED_INPUT_DIR = Path(os.environ.get("SHARED_INPUT_DIR", "/shared_input"))
 
 # ── Docker helpers ──────────────────────────────────────────────────────────
 
@@ -135,6 +136,16 @@ def c_progress_line(c) -> str | None:
 
 
 # ── Scores / telemetry I/O ─────────────────────────────────────────────────
+
+
+def load_manifest() -> dict | None:
+    """Read the actual input manifest.json written by generate_input"""
+    p = SHARED_INPUT_DIR / "input_manifest.json"
+    try:
+        with open(p) as f:
+            return json.load(f)
+    except Exception:
+        return None
 
 
 def load_score_files() -> list[dict]:
@@ -267,30 +278,64 @@ def main():
             }[e],
         )
 
-        load_level = st.slider(
-            "LOAD_LEVEL", 1, 10, 8,
-            help="Higher = larger tensor shape + more pairs",
-        )
-        st.caption(f"Shape {LEVEL_INFO.get(load_level, '?')}")
+        # active race info read from Manifest, not hard coded
+        manifest = load_manifest()
+        if manifest:
+            m_level = manifest.get("load_level", "?")
+            m_shape = manifest.get("shape", [])
+            m_pairs = manifest.get("n_pairs", "?")
+            shape_str = "\u00d7".join(str(d) for d in m_shape)
+            st.markdown("**Active Race Input**")
+            st.markdown(
+                f"""
+                | | |
+                |---|---|
+                | Load level | `{m_level}` |
+                | Tensor Shape | `{shape_str}` |
+                | Pairs | `{m_pairs}` |
+                """
+            )
+        else:
+            st.info("No input Manifest Found Yet")
 
         st.divider()
         auto_refresh = st.toggle("Auto-refresh (live)", value=True)
 
         st.divider()
-        st.markdown("**Manual input generation**")
-        if st.button("⚡ Generate Input", use_container_width=True):
+        st.markdown("**Generate New Input**")
+        st.caption("Canging Level here only takes effect when you click Generate, then restart containers")
+        load_level = st.slider(
+            "New LOAD_LEVEL", 1, 10, manifest.get("loadl_level", 8) if manifest else 8,
+            help = "Higher = Larger Tensor shape + more pairs",
+        )
+        st.caption(LEVEL_INFO.get(load_level, "?"))
+        if st.button("\u26a1 Generate Input", use_container_width=True):
             import subprocess
             import sys as _sys
-            gen = Path(__file__).parent.parent / "shared_input" / "generate_input.py"
-            with st.spinner("Generating tensor pairs..."):
-                subprocess.run(
-                    [_sys.executable, str(gen),
-                     "--load-level", str(load_level),
-                     "--out-dir",
-                     str(Path(__file__).parent.parent / "shared_input")],
-                    check=True,
+            # generate input.py is copied to /app/shared_input/ inside the container
+            # (same directory as app.py's parent), output goes to the shared volume
+            gen = Path(__file__).parent / "shared_input" / "generate_input.py"
+            out_dir = str(SHARED_INPUT_DIR)
+            try:
+                with st.spinner("Generating Tensor Pairs..."):
+                    subprocess.run(
+                        [_sys.executable, str(gen),
+                         "--load-level", str(load_level),
+                         "--out-dir", out_dir],
+                         check=True,
+                         capture_output=True,
+                         text=True,
+                    )
+                st.success("input ready \u2014 restart containers to race!")
+            except subprocess.CalledProcessError as e:
+                st.error(
+                    f"generate_input.py failed (exit {e.returncode}).\n\n"
+                    f"**stderr:** {e.stderr[-600:] if e.stderr else '(none)'}\n\n"
+                    "In Docker, set the load level via the environment variable instead: \n"
+                    "```\n"
+                    f"LOAD_LEVEL={load_level} docker compose -g ddocker-compose.event1.yml up -d\n"
+                    "```"
                 )
-            st.success("Input ready - restart containers to race!")
 
     # ── Tab layout ─────────────────────────────────────────────────────────
     tab_live, tab_history = st.tabs(["🏁  Live Race", "📊  Historical Runs"])
