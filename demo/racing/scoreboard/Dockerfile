@@ -3,7 +3,8 @@ FROM python:3.12-slim
 WORKDIR /app
 
 COPY demo/racing/scoreboard/requirements.txt /app/requirements.txt
-RUN pip install --no-cache-dir -r /app/requirements.txt
+RUN pip install --no-cache-dir --timeout=400 -r /app/requirements.txt
+
 
 # Also copy shared_input generator so the sidebar button can trigger it
 COPY demo/racing/shared_input/ /app/shared_input/

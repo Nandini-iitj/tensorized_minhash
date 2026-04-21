@@ -23,7 +23,7 @@ services:
     container_name: racing_generate_input
     restart: "no"
     environment:
-      LOAD_LEVEL: "${LOAD_LEVEL:-8}"
+      LOAD_LEVEL: "${LOAD_LEVEL:-9}"
       OUT_DIR: /shared_input
     volumes:
       - shared_input:/shared_input

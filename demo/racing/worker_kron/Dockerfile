@@ -4,7 +4,7 @@ WORKDIR /app
 
 # Install engine dependencies
 COPY tensorized_minhash/requirements.txt /app/tensorized_minhash/requirements.txt
-RUN pip install --no-cache-dir -r /app/tensorized_minhash/requirements.txt
+RUN pip install --no-cache-dir --timeout=400 -r /app/tensorized_minhash/requirements.txt
 
 # Copy engine source
 COPY tensorized_minhash/ /app/tensorized_minhash/
@@ -14,7 +14,7 @@ COPY logging.conf /app/logging.conf
 
 # Copy worker
 COPY demo/racing/worker_kron/requirements.txt /app/worker_requirements.txt
-RUN pip install --no-cache-dir -r /app/worker_requirements.txt
+RUN pip install --no-cache-dir --timeout=400 -r /app/worker_requirements.txt
 
 COPY demo/racing/worker_kron/worker.py /app/worker.py
 

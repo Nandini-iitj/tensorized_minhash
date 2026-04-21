@@ -152,3 +152,4 @@ cython_debug/
 
 # Genome Demo Data
 demo/genome/data/*.fasta
+demo/racing/scores/*.json

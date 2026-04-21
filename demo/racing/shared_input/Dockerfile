@@ -4,7 +4,7 @@ WORKDIR /app
 
 # Engine deps + source (mirrors repo structure so relative path walking works)
 COPY tensorized_minhash/requirements.txt /tmp/engine_req.txt
-RUN pip install --no-cache-dir -r /tmp/engine_req.txt
+RUN pip install --no-cache-dir --timeout=400 -r /tmp/engine_req.txt
 
 COPY tensorized_minhash/ /app/tensorized_minhash/
 
