@@ -1,11 +1,15 @@
 """
-app.py - Racing Scoreboard (Streamlit + Docker SDK)
+app.py - MinHash Racing Scoreboard (Streamlit + Docker SDK)
 
-Reads everything from outside the containers:
- • CPU% / RAM  -> container.stats(stream=False)
- • Progress    -> container.logs(tail=20) - workers print "PROGRESS: x/total"
- • Start time  -> container.attrs['State']['StartedAt']
- • Metrics     -> reads JSON files from /scores/ volume
+Architecture:
+  • Uses st.rerun() for live polling - keeps the same Streamlit session so
+    st.session_state.history accumulates properly (meta-refresh creates a new
+    session every cycle and wipes history).
+  • Two tabs:
+      🏁 Live Race   - per-algo cards, progress bars, real-time CPU+RAM charts
+      📊 Historical  - past races replayed from telemetry JSON + results table
+  • When all containers finish, a telemetry JSON is saved to SCORES_DIR so the
+    historical tab can show the same CPU/RAM time-series later.
 
 Run:
     streamlit run app.py --server.port 8501
@@ -22,31 +26,39 @@ import docker
 import pandas as pd
 import streamlit as st
 
-# -----------------------------------------------------------------------------
-# Config
-# -----------------------------------------------------------------------------
+# ── Config ─────────────────────────────────────────────────────────────────
+
 SCORES_DIR = Path(os.environ.get("SCORES_DIR", "/scores"))
 
 ALGO_COLORS = {
-    "kron": " #4e79a7",   # blue
-    "tt": " #f28e2b",   # orange
-    "minhash": " #e15759",   # red
+    "kron":    "#4e79a7",  # blue
+    "tt":      "#f28e2b",  # orange
+    "minhash": "#e15759",  # red
 }
 
 ALGO_LABELS = {
-    "kron": "Kronecker",
-    "tt": "Tensor Train",
-    "minhash": "Minhash (dense)",
+    "kron":    "Kronecker",
+    "tt":      "Tensor Train",
+    "minhash": "MinHash (dense)",
 }
 
 CONTAINER_NAMES = {
     "event1": ["racing_worker_kron", "racing_worker_tt", "racing_worker_minhash"],
-    "event2": ["racing_worker_kron", "racing_worker_tt"]
+    "event2": ["racing_worker_kron", "racing_worker_tt"],
 }
 
-# -----------------------------------------------------------------------------
-# Docker helpers
-# -----------------------------------------------------------------------------
+LEVEL_INFO = {
+    1: "15³ · 30 pairs",   2: "20³ · 50 pairs",
+    3: "28³ · 70 pairs",   4: "35³ · 100 pairs",
+    5: "50³ · 150 pairs",  6: "60³ · 200 pairs",
+    7: "70³ · 250 pairs",  8: "80³ · 320 pairs",
+    9: "90³ · 400 pairs",  10: "100³ · 500 pairs",
+}
+
+POLL_S   = 1.5   # seconds between live refreshes
+MAX_PTS  = 300   # max time-series points retained per algo
+
+# ── Docker helpers ──────────────────────────────────────────────────────────
 
 
 @st.cache_resource
@@ -54,39 +66,38 @@ def get_docker_client():
     return docker.from_env()
 
 
-def get_worker_containers(
-        client: docker.DockerClient, event: str
-        ) -> dict[str, docker.models.containers.Container]:
-    """Return {algo: container} for the given compose event profile."""
-    name_map = {
-        "event1": ["racing_worker_kron", "racing_worker_tt", "racing_worker_datasketch"],
-        "event2": ["racing_worker_kron", "racing_worker_tt"],
-    }
+def get_workers(client, event: str) -> dict:
     result = {}
-    for cname in name_map.get(event, []):
+    for cname in CONTAINER_NAMES.get(event, []):
         try:
             c = client.containers.get(cname)
-            algo = cname.replace("racing_worker_", "")
-            result[algo] = c
+            result[cname.replace("racing_worker_", "")] = c
         except docker.errors.NotFound:
             pass
     return result
 
 
-def container_stats(container) -> dict:
-    """Return CPU % and RAM MB for a running container."""
+def c_status(c) -> str:
     try:
-        raw = container.stats(stream=False)
-        cpu = _cpu_percent(raw)
-        mem = raw["memory_stats"].get("usage", 0) / (1024 * 1024)
-        return {"cpu_pct": round(cpu, 1), "ram_mb": round(mem, 1)}
+        c.reload()
+        return c.status
     except Exception:
-        return {"cpu_pct": 0.0, "ram_mb": 0.0}
+        return "unknown"
 
 
-def _cpu_percent(stats: dict) -> float:
+def c_stats(c) -> dict:
     try:
-        cd = stats["cpu_stats"]
+        raw = c.stats(stream=False)
+        cpu = _cpu_pct(raw)
+        ram = raw["memory_stats"].get("usage", 0) / (1024 * 1024)
+        return {"cpu": round(cpu, 1), "ram": round(ram, 1)}
+    except Exception:
+        return {"cpu": 0.0, "ram": 0.0}
+
+
+def _cpu_pct(stats: dict) -> float:
+    try:
+        cd  = stats["cpu_stats"]
         pd_ = stats["precpu_stats"]
         cpu_d = cd["cpu_usage"]["total_usage"] - pd_["cpu_usage"]["total_usage"]
         sys_d = cd["system_cpu_usage"] - pd_["system_cpu_usage"]
@@ -96,258 +107,455 @@ def _cpu_percent(stats: dict) -> float:
         return 0.0
 
 
-def container_progress(container) -> str | None:
-    """Extract last PROGRESS line from container logs."""
+def c_elapsed(c) -> float:
     try:
-        logs = container.logs(tail=20).decode("utf-8", errors="replace")
-        for line in reversed(logs.splitlines()):
-            if "PROGRESS:" in line or "DONE:" in line:
-                return line.strip()
-    except Exception:
-        pass
-    return None
-
-
-def container_elapsed(container) -> float:
-    """Return elapsed seconds since container start."""
-    try:
-        started = container.attrs["State"]["StartedAt"]
+        started = c.attrs["State"]["StartedAt"]
         dt = datetime.fromisoformat(started.replace("Z", "+00:00"))
         return (datetime.now(UTC) - dt).total_seconds()
     except Exception:
         return 0.0
 
 
-def container_status(container) -> str:
+def c_start_time(c) -> str | None:
     try:
-        container.reload()
-        return container.status  # running | exited | created | ...
+        return c.attrs["State"]["StartedAt"]
     except Exception:
-        return "unknown"
+        return None
 
 
-# -----------------------------------------------------------------------------
-# Scores volume reader
-# -----------------------------------------------------------------------------
+def c_progress_line(c) -> str | None:
+    try:
+        logs = c.logs(tail=30).decode("utf-8", errors="replace")
+        for line in reversed(logs.splitlines()):
+            if any(kw in line for kw in ("PROGRESS:", "DONE:", "OOM:")):
+                return line.strip()
+    except Exception:
+        pass
+    return None
+
+
+# ── Scores / telemetry I/O ─────────────────────────────────────────────────
 
 
 def load_score_files() -> list[dict]:
-    """Read all *_metrics.json files from the scores volume."""
-    records = []
     if not SCORES_DIR.exists():
-        return records
-    for f in sorted(SCORES_DIR.glob("*_metrics.json")):
+        return []
+    out = []
+    for f in sorted(SCORES_DIR.glob("*_metrics.json"), reverse=True):
         try:
             with open(f) as fh:
                 d = json.load(fh)
-                d["_file"] = f.name
-                records.append(d)
+            d["_file"] = f.name
+            out.append(d)
         except Exception:
             pass
-    return records
+    return out
 
 
-# -----------------------------------------------------------------------------
-# Session state helpers
-# -----------------------------------------------------------------------------
+def load_telemetry_files() -> list[dict]:
+    if not SCORES_DIR.exists():
+        return []
+    out = []
+    for f in sorted(SCORES_DIR.glob("telemetry_*.json"), reverse=True):
+        try:
+            with open(f) as fh:
+                d = json.load(fh)
+            d["_file"] = f.name
+            out.append(d)
+        except Exception:
+            pass
+    return out
 
 
-def _init_history():
-    if "history" not in st.session_state:
-        st.session_state.history = {}  # algo -> list of {t, cpu, ram}
+def save_telemetry(race_id: str, history: dict, algos_done: dict):
+    ts = int(time.time())
+    SCORES_DIR.mkdir(parents=True, exist_ok=True)
+    out = SCORES_DIR / f"telemetry_{ts}.json"
+    with open(out, "w") as f:
+        json.dump(
+            {
+                "race_id":   race_id,
+                "timestamp": ts,
+                "algos":     list(history.keys()),
+                "telemetry": history,
+                "final":     algos_done,
+            },
+            f,
+            indent=2,
+        )
 
 
-def _push_history(algo: str, cpu: float, ram: float):
+# ── Session state ───────────────────────────────────────────────────────────
+
+
+def init_state():
+    defaults = {
+        "history":        {},    # algo -> [{t, cpu, ram}]
+        "race_id":        None,  # earliest container start-time string
+        "race_done":      False, # telemetry saved for current race
+        "race_start_abs": None,  # float: time.time() when race first detected
+    }
+    for k, v in defaults.items():
+        if k not in st.session_state:
+            st.session_state[k] = v
+
+
+def push_history(algo: str, t_rel: float, cpu: float, ram: float):
     h = st.session_state.history.setdefault(algo, [])
-    h.append({"t": time.time(), "cpu": cpu, "ram": ram})
-    if len(h) > MAX_HISTORY:
+    h.append({"t": round(t_rel, 1), "cpu": cpu, "ram": ram})
+    if len(h) > MAX_PTS:
         h.pop(0)
 
 
-# -----------------------------------------------------------------------------
-# UI
-# -----------------------------------------------------------------------------
+def detect_race_id(workers: dict) -> str | None:
+    times = [c_start_time(c) for c in workers.values()]
+    times = [t for t in times if t]
+    return min(times) if times else None
+
+
+# ── Chart helpers ───────────────────────────────────────────────────────────
+
+
+def timeseries_df(history: dict, metric: str) -> "pd.DataFrame | None":
+    if not history:
+        return None
+    frames = {}
+    for algo, pts in history.items():
+        if pts:
+            label = ALGO_LABELS.get(algo, algo.upper())
+            frames[label] = pd.Series(
+                [p[metric] for p in pts],
+                index=[p["t"] for p in pts],
+            )
+    if not frames:
+        return None
+    df = pd.DataFrame(frames)
+    df.index.name = "seconds"
+    return df
+
+
+def draw_ts(history: dict, metric: str, height: int = 220):
+    df = timeseries_df(history, metric)
+    if df is not None and not df.empty:
+        st.line_chart(df, height=height, use_container_width=True)
+    else:
+        st.caption("Waiting for data...")
+
+
+# ── Main ────────────────────────────────────────────────────────────────────
 
 
 def main():
     st.set_page_config(
         page_title="MinHash Racing Track",
-        page_icon="🏎️",
+        page_icon="🏁",
         layout="wide",
     )
-    _init_history()
-
+    init_state()
     client = get_docker_client()
 
-    # --- Sidebar controls
+    # ── Sidebar ────────────────────────────────────────────────────────────
     with st.sidebar:
-        st.title("🏎️ Racing Controls")
+        st.title("🏁 Racing Controls")
 
         event = st.selectbox(
             "Event",
             ["event1", "event2"],
             format_func=lambda e: {
-                "event1": "Event 1 - Kron vs TT vs Datasketch",
+                "event1": "Event 1 - Kron vs TT vs MinHash",
                 "event2": "Event 2 - Kron vs TT (higher load)",
             }[e],
         )
 
         load_level = st.slider(
-            "LOAD_LEVEL",
-            min_value=1,
-            max_value=10,
-            value=7,
-            help="Higher = bigger tensor shape + more pairs",
+            "LOAD_LEVEL", 1, 10, 8,
+            help="Higher = larger tensor shape + more pairs",
         )
-
-        level_info = {
-            1: "shape 15³ • 30 pairs",
-            2: "shape 20³ • 50 pairs",
-            3: "shape 28³ • 70 pairs",
-            4: "shape 35³ • 100 pairs",
-            5: "shape 50³ • 150 pairs",
-            6: "shape 60³ • 200 pairs",
-            7: "shape 70³ • 250 pairs",
-            8: "shape 80³ • 320 pairs",
-            9: "shape 90³ • 400 pairs",
-            10: "shape 100³ • 500 pairs",
-        }
-        st.caption(f"ℹ️ {level_info[load_level]}")
+        st.caption(f"Shape {LEVEL_INFO.get(load_level, '?')}")
 
         st.divider()
-        st.markdown("**Input generation**")
-        if st.button("🪄 Generate Input", use_container_width=True):
-            with st.spinner("Generating tensor pairs..."):
-                import subprocess
-                import sys
+        auto_refresh = st.toggle("Auto-refresh (live)", value=True)
 
-                gen = Path(__file__).parent.parent / "shared_input" / "generate_input.py"
+        st.divider()
+        st.markdown("**Manual input generation**")
+        if st.button("⚡ Generate Input", use_container_width=True):
+            import subprocess
+            import sys as _sys
+            gen = Path(__file__).parent.parent / "shared_input" / "generate_input.py"
+            with st.spinner("Generating tensor pairs..."):
                 subprocess.run(
-                    [
-                        sys.executable,
-                        str(gen),
-                        "--load-level",
-                        str(load_level),
-                        "--out-dir",
-                        str(Path(__file__).parent.parent / "shared_input"),
-                    ],
+                    [_sys.executable, str(gen),
+                     "--load-level", str(load_level),
+                     "--out-dir",
+                     str(Path(__file__).parent.parent / "shared_input")],
                     check=True,
                 )
             st.success("Input ready - restart containers to race!")
 
-        st.divider()
-        refresh = st.toggle("Auto-refresh", value=True)
+    # ── Tab layout ─────────────────────────────────────────────────────────
+    tab_live, tab_history = st.tabs(["🏁  Live Race", "📊  Historical Runs"])
 
-    # Auto-refresh
-    if refresh:
-        st.html(f"""<meta http-equiv="refresh" content="{REFRESH_MS // 1000}">""")
+    # ======================================================================
+    #  Collect live data - runs regardless of which tab is visible
+    # ======================================================================
+    workers = get_workers(client, event)
+    any_running = False
+    algo_info: dict = {}
+    all_done = True
+    algos_done: dict = {}
 
-    # --- Header
-    st.title("🏁 MinHash Algorithm Racing Track")
-    st.caption(
-        f"Event: **{event}** •  Load level: **{load_level}** •  "
-        f"Refreshing every {REFRESH_MS // 1000}s"
-    )
+    if workers:
+        race_id = detect_race_id(workers)
+        if race_id != st.session_state.race_id:
+            # New race detected - reset accumulated history
+            st.session_state.history = {}
+            st.session_state.race_id = race_id
+            st.session_state.race_done = False
+            st.session_state.race_start_abs = time.time()
 
-    # --- Live container table
-    st.subheader("Live Race Status")
-    workers = get_worker_containers(client, event)
+        race_start = st.session_state.race_start_abs or time.time()
+        t_rel = time.time() - race_start
 
-    if not workers:
-        st.warning(
-            "No containers found. Start them with: "
-            f"`docker compose -f docker-compose.{event}.yml up -d`"
-        )
-    else:
-        rows = []
-        for algo, container in workers.items():
-            status = container_status(container)
-            elapsed = container_elapsed(container)
-            stats = (
-                container_stats(container)
-                if status == "running"
-                else {"cpu_pct": 0.0, "ram_mb": 0.0}
-            )
-            progress = container_progress(container) or "-"
+        for algo, c in workers.items():
+            status  = c_status(c)
+            elapsed = c_elapsed(c)
+            is_running = status == "running"
+            if is_running:
+                all_done = False
+                any_running = True
 
-            _push_history(algo, stats["cpu_pct"], stats["ram_mb"])
+            stats = c_stats(c) if is_running else {"cpu": 0.0, "ram": 0.0}
+            log   = c_progress_line(c) or "-"
 
-            # Parse progress fraction
             frac = 0.0
-            m = re.search(r"PROGRESS:\s*(\d+)/(\d+)", progress)
+            m = re.search(r"PROGRESS:\s*(\d+)/(\d+)", log)
             if m:
                 frac = int(m.group(1)) / max(int(m.group(2)), 1)
-            if "DONE:" in progress:
+
+            done_m = re.search(r"DONE:.*elapsed=([\d.]+)s.*mae=([\d.]+)", log)
+            oom    = "OOM:" in log
+
+            if done_m or status == "exited":
                 frac = 1.0
-
-            rows.append(
-                {
-                    "Algorithm": algo.upper(),
-                    "Status": status,
-                    "CPU %": f"{stats['cpu_pct']:.1f}",
-                    "RAM (MB)": f"{stats['ram_mb']:.0f}",
-                    "Progress": f"{frac * 100:.0f}%",
-                    "Elapsed (s)": f"{elapsed:.1f}",
-                    "Last log": progress[:80],
+                algos_done[algo] = {
+                    "elapsed_s": float(done_m.group(1)) if done_m else elapsed,
+                    "mae":       float(done_m.group(2)) if done_m else None,
                 }
+
+            push_history(algo, t_rel, stats["cpu"], stats["ram"])
+
+            algo_info[algo] = {
+                "status":  status,
+                "running": is_running,
+                "elapsed": elapsed,
+                "cpu":     stats["cpu"],
+                "ram":     stats["ram"],
+                "frac":    frac,
+                "log":     log,
+                "oom":     oom,
+            }
+
+        # Save telemetry once when all containers finish
+        if all_done and not st.session_state.race_done and algos_done:
+            save_telemetry(race_id, st.session_state.history, algos_done)
+            st.session_state.race_done = True
+
+    # ======================================================================
+    #  TAB 1 - LIVE RACE
+    # ======================================================================
+    with tab_live:
+        if not workers:
+            st.warning(
+                f"No containers found. Start them with:\n\n"
+                f"```\ndocker compose -f docker-compose.{event}.yml up -d\n```"
             )
+        else:
+            # ── Header blinker ──────────────────────────────────────────
+            if all_done:
+                st.success("🏆  Race complete! All workers have finished.")
+            else:
+                blink = "🔴" if int(time.time() * 2) % 2 == 0 else "🟠"
+                elapsed_total = time.time() - (st.session_state.race_start_abs or time.time())
+                st.markdown(
+                    f"<h2 style='margin:0'>{blink}&nbsp;&nbsp;Race in progress...</h2>",
+                    unsafe_allow_html=True,
+                )
+                st.caption(
+                    f"Race clock: **{elapsed_total:.0f}s**  ·  "
+                    f"auto-refreshing every {POLL_S:.0f}s"
+                )
 
-        df_live = pd.DataFrame(rows)
-        st.dataframe(df_live, use_container_width=True, hide_index=True)
+            st.divider()
 
-        # Sparklines (CPU)
-        st.subheader("CPU % over time")
-        spark_data = {}
-        for algo, hist in st.session_state.history.items():
-            if hist:
-                spark_data[algo.upper()] = [h["cpu"] for h in hist]
-        if spark_data:
-            max_len = max(len(v) for v in spark_data.values())
-            df_spark = pd.DataFrame(
-                {k: v + [None] * (max_len - len(v)) for k, v in spark_data.items()}
+            # ── Per-algo cards ──────────────────────────────────────────
+            finish_order = sorted(
+                [a for a, i in algo_info.items() if i["frac"] == 1.0],
+                key=lambda a: algo_info[a]["elapsed"],
             )
-            st.line_chart(df_spark)
+            medals = dict(zip(finish_order, ["🥇", "🥈", "🥉"], strict=False))
 
-    # --- Historical scores
-    st.subheader("Historical Run Results (from scores volume)")
-    score_records = load_score_files()
-    if score_records:
-        df_scores = pd.DataFrame(
-            [
-                {
-                    "Run time": datetime.fromtimestamp(r.get("timestamp", 0)).strftime(
+            cols = st.columns(len(algo_info))
+            for col, (algo, info) in zip(cols, algo_info.items(), strict=False):
+                color = ALGO_COLORS.get(algo, "#888")
+                label = ALGO_LABELS.get(algo, algo.upper())
+                medal = medals.get(algo, "")
+
+                if info["oom"]:
+                    icon, badge_txt = "💥", "OOM"
+                elif info["frac"] == 1.0:
+                    icon = medal or "🏁"
+                    badge_txt = f"{info['elapsed']:.1f}s"
+                elif info["running"]:
+                    icon, badge_txt = "🏃", f"{info['elapsed']:.1f}s"
+                else:
+                    icon, badge_txt = "⏳", info["status"]
+
+                with col:
+                    st.markdown(
+                        f"""
+                        <div style="border-left:5px solid {color};
+                                    padding:10px 14px;border-radius:6px;
+                                    background:rgba(255,255,255,0.04);
+                                    margin-bottom:8px;">
+                          <div style="font-size:0.85em;color:#aaa;margin-bottom:2px">
+                            {icon} {label}
+                          </div>
+                          <div style="font-size:2em;font-weight:bold;
+                                      color:{color};line-height:1.1">
+                            {badge_txt}
+                          </div>
+                        </div>
+                        """,
+                        unsafe_allow_html=True,
+                    )
+                    st.progress(info["frac"], text=f"{info['frac'] * 100:.0f}%")
+                    st.caption(f"CPU {info['cpu']:.1f}%  ·  RAM {info['ram']:.0f} MB")
+                    st.caption(info["log"][:72])
+
+            st.divider()
+
+            # ── Real-time CPU + RAM charts ──────────────────────────────
+            hist = st.session_state.history
+            if hist and any(hist.values()):
+                c1, c2 = st.columns(2)
+                with c1:
+                    st.markdown("**CPU % - real-time**")
+                    draw_ts(hist, "cpu")
+                with c2:
+                    st.markdown("**RAM (MB) - real-time**")
+                    draw_ts(hist, "ram")
+            else:
+                st.info("Charts will appear once polling begins...")
+
+            # ── Results table (once race is done) ───────────────────────
+            if all_done:
+                st.divider()
+                st.subheader("Race Results")
+                now = time.time()
+                recent = [r for r in load_score_files()
+                          if abs(r.get("timestamp", 0) - now) < 300]
+                if recent:
+                    rows = []
+                    for r in sorted(recent, key=lambda r: r.get("elapsed_s", 999)):
+                        rows.append({
+                            "Rank":        ["🥇", "🥈", "🥉", "4th"][min(len(rows), 3)],
+                            "Algorithm":   ALGO_LABELS.get(r.get("algo", ""), r.get("algo", "?")),
+                            "Elapsed (s)": r.get("elapsed_s", "?"),
+                            "MAE":         r.get("mae", "?"),
+                            "Max err":     r.get("max_error", "?"),
+                            "Pairs":       r.get("n_pairs", "?"),
+                            "Mem (KB)":    r.get("memory_kb", "?"),
+                        })
+                    st.dataframe(
+                        pd.DataFrame(rows),
+                        use_container_width=True,
+                        hide_index=True,
+                    )
+
+    # ======================================================================
+    #  TAB 2 - HISTORICAL RUNS
+    # ======================================================================
+    with tab_history:
+        tel_files   = load_telemetry_files()
+        score_files = load_score_files()
+
+        if not tel_files and not score_files:
+            st.info("No historical data yet - complete a race first!")
+        elif tel_files:
+            st.subheader(f"{len(tel_files)} past race(s) on record")
+            for i, tel in enumerate(tel_files):
+                ts       = tel.get("timestamp", 0)
+                run_lbl  = datetime.fromtimestamp(ts).strftime("%Y-%m-%d  %H:%M:%S")
+                tel_hist = tel.get("telemetry", {})
+                algos_in = tel.get("algos", [])
+
+                all_t    = [p["t"] for pts in tel_hist.values() for p in pts]
+                duration = f"{max(all_t):.0f}s" if all_t else "?"
+
+                header = (
+                    f"🏁  {run_lbl}  -  duration {duration}  -  "
+                    + ", ".join(ALGO_LABELS.get(a, a.upper()) for a in algos_in)
+                )
+                with st.expander(header, expanded=(i == 0)):
+                    if tel_hist:
+                        c1, c2 = st.columns(2)
+                        with c1:
+                            st.markdown("**CPU % during race**")
+                            draw_ts(tel_hist, "cpu")
+                        with c2:
+                            st.markdown("**RAM (MB) during race**")
+                            draw_ts(tel_hist, "ram")
+                    else:
+                        st.caption("No telemetry data stored for this run.")
+
+                    run_scores = [
+                        r for r in score_files
+                        if abs(r.get("timestamp", 0) - ts) < 180
+                    ]
+                    if run_scores:
+                        st.markdown("**Results**")
+                        rows = []
+                        for r in sorted(run_scores, key=lambda r: r.get("elapsed_s", 999)):
+                            rows.append({
+                                "Algorithm":   ALGO_LABELS.get(r.get("algo", ""), r.get("algo", "?")),
+                                "Shape":       "×".join(str(d) for d in r.get("shape", [])),
+                                "Pairs":       r.get("n_pairs", "?"),
+                                "Elapsed (s)": r.get("elapsed_s", "?"),
+                                "MAE":         r.get("mae", "?"),
+                                "Max err":     r.get("max_error", "?"),
+                                "Mem (KB)":    r.get("memory_kb", "?"),
+                            })
+                        st.dataframe(
+                            pd.DataFrame(rows),
+                            use_container_width=True,
+                            hide_index=True,
+                        )
+                    else:
+                        st.caption("No matching metric files for this run.")
+        else:
+            # Fallback: telemetry files not yet present, show raw summary table
+            st.subheader("Run Summary (no telemetry available yet)")
+            rows = []
+            for r in score_files:
+                rows.append({
+                    "Run time":    datetime.fromtimestamp(r.get("timestamp", 0)).strftime(
                         "%Y-%m-%d %H:%M"
                     ),
-                    "Algorithm": r.get("algo", "?").upper(),
-                    "Level": r.get("load_level", "?"),
-                    "Shape": "x".join(str(d) for d in r.get("shape", [])),
-                    "Pairs": r.get("n_pairs", "?"),
+                    "Algorithm":   ALGO_LABELS.get(r.get("algo", ""), r.get("algo", "?")),
+                    "Level":       r.get("load_level", "?"),
+                    "Shape":       "×".join(str(d) for d in r.get("shape", [])),
+                    "Pairs":       r.get("n_pairs", "?"),
                     "Elapsed (s)": r.get("elapsed_s", "?"),
-                    "MAE": r.get("mae", "?"),
-                    "Max err": r.get("max_error", "?"),
-                    "Mem (KB)": r.get("memory_kb", "?"),
-                }
-                for r in score_records
-            ]
-        )
-        st.dataframe(df_scores, use_container_width=True, hide_index=True)
+                    "MAE":         r.get("mae", "?"),
+                    "Max err":     r.get("max_error", "?"),
+                    "Mem (KB)":    r.get("memory_kb", "?"),
+                })
+            st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
 
-        # Time-series: elapsed vs load_level per algo
-        st.subheader("Speed vs Load Level")
-        pivot = df_scores.pivot_table(
-            index="Level", columns="Algorithm", values="Elapsed (s)", aggfunc="min"
-        ).reset_index()
-        if not pivot.empty:
-            st.line_chart(pivot.set_index("Level"))
-
-        st.subheader("Accuracy (MAE) vs Load Level")
-        pivot_mae = df_scores.pivot_table(
-            index="Level", columns="Algorithm", values="MAE", aggfunc="min"
-        ).reset_index()
-        if not pivot_mae.empty:
-            st.line_chart(pivot_mae.set_index("Level"))
-    else:
-        st.info("No score files found yet - run a race first!")
+    # ── Live auto-refresh - st.rerun() keeps the same session alive ─────────
+    if auto_refresh and any_running:
+        time.sleep(POLL_S)
+        st.rerun()
 
 
 if __name__ == "__main__":

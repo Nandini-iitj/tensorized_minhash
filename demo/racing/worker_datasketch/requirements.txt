@@ -1,2 +1,1 @@
 numpy>=1.26
-datasketch>=1.6
