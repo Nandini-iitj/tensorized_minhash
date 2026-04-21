@@ -264,7 +264,7 @@ class TestTTMinHash:
 
 class TestThreeScenarioBenchmark:
     """
-    Validates the three-scenario accuracy benchmark meets the proposal target:
+    Validates the three-scenario accuracy benchmark meets the target:
     Spearman r > 0.85 on the combined (full Jaccard range) results.
     """
 
@@ -277,7 +277,7 @@ class TestThreeScenarioBenchmark:
         acc = benchmark_accuracy(n_pairs=60, shape=(25, 25, 25), num_hashes=128, seed=0)
         kron_rho = acc["tensorized_kron"]["spearman_r"]
         assert kron_rho > 0.85, (
-            f"Kron Spearman r = {kron_rho:.4f} - must exceed 0.85 (proposal target). "
+            f"Kron Spearman r = {kron_rho:.4f} - must exceed 0.85"
             f"Jaccard range was {acc['jaccard_range']}"
         )
 

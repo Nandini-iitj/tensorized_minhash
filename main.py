@@ -259,7 +259,7 @@ def run_resource_profile(quick: bool = False, real_tensors: list = None):
     subsection("2b • Accuracy - Jaccard Approximation")
 
     if real_tensors is not None and len(real_tensors) >= 2:
-        n_pairs = 30 if quick else 100
+        n_pairs = 30 if quick else 300
         acc = benchmark_accuracy_from_tensors(
             tensors=real_tensors,
             shape=real_tensors[0].shape,
@@ -270,7 +270,7 @@ def run_resource_profile(quick: bool = False, real_tensors: list = None):
         scenario_data = None
     else:
         print("  No real tensors provided - using synthetic data\n")
-        n_pairs = 30 if quick else 100
+        n_pairs = 30 if quick else 300
         acc = benchmark_accuracy(n_pairs=n_pairs, shape=(30, 30, 30), num_hashes=128)
         scenario_data = acc.get("scenarios")
 
@@ -316,7 +316,6 @@ def run_resource_profile(quick: bool = False, real_tensors: list = None):
     j_lo, j_hi = acc["jaccard_range"]
     subsection(f"Overall (all scenarios)  [Jaccard {j_lo:.2f}–{j_hi:.2f}]")
     table(headers, method_rows(acc), col_widths=col_widths)
-    print("  Proposal target: Spearman ρ > 0.85")
 
     # Speed
     subsection("2c • Hashing Throughput")

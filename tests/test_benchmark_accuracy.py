@@ -2,7 +2,7 @@
 Tests for the three-scenario accuracy benchmark.
 
 Validates that the combined Spearman ρ across high/medium/low similarity
-scenarios exceeds the proposal target of 0.85, and that each scenario
+scenarios exceeds the target of 0.85, and that each scenario
 produces Jaccard values in the expected range.
 """
 
@@ -11,19 +11,19 @@ from benchmarks import benchmark_accuracy
 
 class TestThreeScenarioBenchmark:
     """
-    Validates the three-scenario accuracy benchmark meets the proposal target:
+    Validates the three-scenario accuracy benchmark meets the target:
     Spearman ρ > 0.85 on the combined (full Jaccard range) results.
     """
 
     def test_combined_spearman_above_target(self):
         """
         Combined Spearman ρ across all three scenarios must exceed 0.85.
-        This is the primary proposal evaluation metric.
+        This is the primary evaluation metric.
         """
         acc = benchmark_accuracy(n_pairs=60, shape=(25, 25, 25), num_hashes=128, seed=0)
         kron_rho = acc["tensorized_kron"]["spearman_r"]
         assert kron_rho > 0.85, (
-            f"Kron Spearman ρ = {kron_rho:.4f} — must exceed 0.85 (proposal target). "
+            f"Kron Spearman ρ = {kron_rho:.4f} — must exceed 0.85 (target). "
             f"Jaccard range was {acc['jaccard_range']}"
         )
 

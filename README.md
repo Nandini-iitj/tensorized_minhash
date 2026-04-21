@@ -26,7 +26,7 @@ MB) per hashing layer. This project replaces that with two compressed alternativ
 | Kronecker (Kron)       | 38,400      | 0.15 MB | ~3,400x  |
 
 Both compressed methods achieve **Spearman p > 0.90** correlation with exact Jaccard across the
-full [0, 1] similarity range, matching and exceeding the proposal target of p > 0.85.
+full [0, 1] similarity range, matching and exceeding the target of p > 0.85.
 
 ---
 
@@ -135,7 +135,7 @@ tensorized_minhash-main/
 
 ## Benchmark Results
 
-Results on CIC-IDS2017 network-traffic tensors, shape ≈ (n_src _ n_dst _ n_port), k = 128 hash
+Results on CIC-IDS2017 network-traffic tensors, shape ≈ (n*src * n*dst * n_port), k = 128 hash
 functions.
 
 ### Accuracy
