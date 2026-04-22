@@ -117,6 +117,7 @@ celerybeat.pid
 # Environments
 .env
 .venv
+.venv/
 env/
 venv/
 ENV/
@@ -153,3 +154,11 @@ cython_debug/
 # Genome Demo Data
 demo/genome/data/*.fasta
 demo/racing/scores/*.json
+
+# IDE
+.vscode
+.vscode/
+
+# Platform
+**/.DS_Store
+.DS_Store
