@@ -104,6 +104,7 @@ events - see **[demo/README.md](demo/README.md)**.
 
 ---
 
+````text
 tensorized_minhash-main/
 ├── README.md
 ├── pyproject.toml # dependencies, pytest config, ruff config
@@ -130,6 +131,7 @@ tensorized_minhash-main/
 │ ├── tests/
 │ │ └── (100 unit tests across 9 test files)
 └── ...
+\```
 
 ---
 
@@ -140,19 +142,19 @@ functions.
 
 ### Accuracy
 
-| Method                | MAE   | Spearman ρ | Target   |
-| --------------------- | ----- | ---------- | -------- |
-| Kronecker MinHash     | 0.023 | **0.912**  | > 0.85 ✓ |
-| Tensor Train (TT)     | 0.021 | **0.895**  | > 0.85 ✓ |
-| Datasketch (standard) | 0.021 | **0.901**  | > 0.85 ✓ |
+| Method                | MAE    | Spearman ρ  |
+| --------------------- | ------ | ----------- |
+| Kronecker MinHash     | 0.0358 | **0.9260**  |
+| Tensor Train (TT)     | 0.0347 | **0.9364**  |
+| Datasketch (standard) | 0.0181 | **0.9375**  |
 
 ### Speed
 
 | Method                | Tensors/sec | ms/tensor |
 | --------------------- | ----------- | --------- |
-| Kronecker MinHash     | ~285        | ~3.5      |
-| Tensor Train (TT)     | ~53         | ~18.7     |
-| Datasketch (standard) | ~94         | ~10.6     |
+| Kronecker MinHash     | ~93.8       | ~10.66    |
+| Tensor Train (TT)     | ~84.6       | ~11.82    |
+| Datasketch (standard) | ~236.6      | ~4.23     |
 
 Kronecker is **3x faster** than Datasketch and **5x faster** than TT.
 
@@ -182,3 +184,4 @@ Kronecker is **3x faster** than Datasketch and **5x faster** than TT.
 The `data/` folder ships two CIC-IDS2017 CSV samples (Wednesday and Friday captures). The full
 dataset is available at https://www.unb.ca/cic/datasets/ids-2017.html. A synthetic generator
 (`NetworkLogGenerator`) is included so all benchmarks run without the full dataset.
+````
