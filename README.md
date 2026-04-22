@@ -104,7 +104,7 @@ events - see **[demo/README.md](demo/README.md)**.
 
 ---
 
-````text
+```text
 tensorized_minhash-main/
 ├── README.md
 ├── pyproject.toml # dependencies, pytest config, ruff config
@@ -131,7 +131,8 @@ tensorized_minhash-main/
 │ ├── tests/
 │ │ └── (100 unit tests across 9 test files)
 └── ...
-\```
+
+```
 
 ---
 
@@ -142,11 +143,11 @@ functions.
 
 ### Accuracy
 
-| Method                | MAE    | Spearman ρ  |
-| --------------------- | ------ | ----------- |
-| Kronecker MinHash     | 0.0358 | **0.9260**  |
-| Tensor Train (TT)     | 0.0347 | **0.9364**  |
-| Datasketch (standard) | 0.0181 | **0.9375**  |
+| Method                | MAE    | Spearman ρ |
+| --------------------- | ------ | ---------- |
+| Kronecker MinHash     | 0.0358 | **0.9260** |
+| Tensor Train (TT)     | 0.0347 | **0.9364** |
+| Datasketch (standard) | 0.0181 | **0.9375** |
 
 ### Speed
 
@@ -184,4 +185,3 @@ Kronecker is **3x faster** than Datasketch and **5x faster** than TT.
 The `data/` folder ships two CIC-IDS2017 CSV samples (Wednesday and Friday captures). The full
 dataset is available at https://www.unb.ca/cic/datasets/ids-2017.html. A synthetic generator
 (`NetworkLogGenerator`) is included so all benchmarks run without the full dataset.
-````
