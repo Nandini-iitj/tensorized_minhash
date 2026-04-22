@@ -10,7 +10,7 @@ Design:
 
 Scalability argument:
   Standard MinHash on 100^3 tensors: each hash function needs a 100^3=1M
-  param vector → 128 hash functions = 128M floats = 512 MB just for params.
+  param vector -> 128 hash functions = 128M floats = 512 MB just for params.
   With Kronecker: 3 * 100 * 128 = 38,400 params = 150 KB. This fits in the
   Spark broadcast variable (recommended < 10 MB). Workers never OOM from
   hash-function parameters regardless of cluster size.
@@ -220,7 +220,7 @@ class SparkTensorHasher:
                 band_key = (b, band_sig.tobytes())
                 yield (band_key, doc_id)
 
-        # Group by band key → candidate pairs
+        # Group by band key -> candidate pairs
         band_rdd = sig_rdd.flatMap(emit_band_keys).groupByKey()
 
         def make_pairs(record):

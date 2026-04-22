@@ -1,249 +1,140 @@
 """
-Tensorized MinHash via Tensor Train (TT) and Kronecker Product compression.
+TTDecomposedMinHash - Tensor Train decomposed MinHash.
 
-Implements the core technique from:
-  "Improving LSH via Tensorized Random Projection" (2025)
+Stores num_hashes independent TT decompositions, each with standard
+boundary ranks (r_0 = r_d = 1) and inner bond dimension tt_rank.
+Core shapes: (1, n_0, r), (r, n_1, r), ..., (r, n_{d-1}, 1).
 
-Key idea: A random projection matrix W ∈ R^{d1*d2*...*dn × k} normally needs
-O(d^n * k) memory. By representing W as a Kronecker product of n small factor
-matrices W_i ∈ R^{d_i × k}, we store only O(n * d * k) parameters, then
-simulate the full projection on-the-fly via the mixed-product property:
-  (A ⊗ B)(x_A ⊗ x_B) = (Ax_A) ⊗ (Bx_B)
+For each hash function j and nonzero cell (i_0,...,i_{d-1}), the rank is:
+    rank_j(i_0,...,i_{d-1}) = G_0[0, i_0, :] @ G_1[:, i_1, :] @ ... @ G_{d-1}[:, i_{d-1}, 0]
 
-For MinHash: we approximate min-hash signatures without flattening tensors.
+This is a scalar. With random Gaussian cores, these scalars approximate
+i.i.d. random variables, so argmin over nonzero cells preserves Jaccard:
+    Pr[argmin_{A} rank_j == argmin_{B} rank_j] ≈ J(A, B)
+
+Memory: num_hashes * d * n * r^2 - linear in all dimensions, compared to
+O(n^d * k) for the full matrix. More expressive than Kronecker (which uses
+additive Exp(1) ranks) but still dramatically compressed.
 """
 
-import numpy as np
-from typing import List, Tuple, Optional, Dict
-import time
 import logging
+
+import numpy as np
+
+from .config import TTMinHashConfig
+
+__all__ = ["TTDecomposedMinHash"]
 
 logger = logging.getLogger(__name__)
 
 
-class TTMinHashConfig:
-    """Configuration for the TT-MinHash hasher."""
-
-    def __init__(
-        self,
-        shape: Tuple[int, ...],   # tensor mode sizes e.g. (100, 100, 100)
-        num_hashes: int = 128,     # number of MinHash signatures (k)
-        tt_rank: int = 4,          # TT bond dimension (compression knob)
-        seed: int = 42,
-    ):
-        self.shape = shape
-        self.ndim = len(shape)
-        self.num_hashes = num_hashes
-        self.tt_rank = tt_rank
-        self.seed = seed
-
-        # Theoretical savings
-        full_params = int(np.prod(shape)) * num_hashes
-        kron_params = sum(s * num_hashes for s in shape)
-        self.compression_ratio = full_params / max(kron_params, 1)
-
-        logger.info(
-            f"TTMinHashConfig: shape={shape}, k={num_hashes}, "
-            f"full_params={full_params:,}, kron_params={kron_params:,}, "
-            f"compression={self.compression_ratio:.1f}x"
-        )
-
-
-class KroneckerMinHash:
-    """
-    MinHash using Kronecker-factored random projections.
-
-    Core idea (from the 2025 paper):
-    A standard MinHash hash function h_pi: 2^U → U picks the minimum element
-    under a random permutation π of the universe.
-
-    For a tensor T of shape (d0, d1, ..., dn), the universe is all multi-indices
-    (i0, i1, ..., in).  Rather than storing |U| = prod(shape) random values
-    (the permutation), we generate k independent random projections per mode
-    and approximate the permutation rank via the Kronecker (outer product)
-    combination:
-
-        rank(i0, i1, ..., in) ≈ W0[i0] * W1[i1] * ... * Wn[in]
-
-    where Wm ∈ R^{dm} is a vector of Uniform(0,1) random values.  The minimum
-    over nonzero cells of T under this combined rank approximates the MinHash
-    function.  We repeat k times (k independent sets of Wm) to get k hash values.
-
-    Jaccard approximation theorem: E[h_j(A) == h_j(B)] = J(A, B).
-
-    Memory: instead of k * prod(shape) random values, we store k * sum(shape)
-    values — from O(n^d * k) to O(n*d*k), a factor of n^(d-1) reduction.
-    For shape=(100,100,100), k=128: 128M → 38,400 parameters.
-    """
-
-    def __init__(self, config: TTMinHashConfig):
-        self.cfg = config
-        rng = np.random.default_rng(config.seed)
-
-        # Factor vectors: list of [num_hashes, shape[i]]
-        # We use -log(Uniform(0,1)) ~ Exponential(1) random variables.
-        # Rationale: for a standard MinHash over a universe U, the classic
-        # "bottom-k" construction assigns each element u an independent
-        # Exp(1) r.v. r(u), then the hash is argmin_u r(u) among active elements.
-        # With the Kronecker factoring, we approximate r(i0,i1,...,in) as the
-        # SUM of independent Exp(1) r.v.s per mode:
-        #   r_j(i0,...,in) = E0[j,i0] + E1[j,i1] + ... + En[j,in]
-        # where Em[j,im] ~ Exp(1). Sums of exponentials concentrate around their
-        # mean, providing a stable, consistent rank ordering. The minimum under
-        # this additive rank is equivalent to the minimum under a valid hash
-        # function in the sense of preserving Jaccard via:
-        #   Pr[argmin_A r_j == argmin_B r_j] ≈ J(A, B)
-        # This outperforms the product-of-Uniforms approach because the additive
-        # structure avoids rank collapse when mode values are close to zero.
-        self.factors: List[np.ndarray] = []
-        for s in config.shape:
-            u = rng.random((config.num_hashes, s))
-            u = np.clip(u, 1e-10, 1.0)  # avoid log(0)
-            exp_rvs = -np.log(u).astype(np.float64)
-            self.factors.append(exp_rvs)
-
-        # Parameter count
-        self.param_count = sum(f.size for f in self.factors)
-        self.full_param_count = int(np.prod(config.shape)) * config.num_hashes
-
-    def hash_tensor(self, tensor: np.ndarray) -> np.ndarray:
-        """
-        Compute k-dimensional MinHash signature for a single tensor.
-
-        For each hash function j:
-          1. Compute rank(i0,...,in) = W0[j,i0] * W1[j,i1] * ... * Wn[j,in]
-          2. hash_j(T) = argmin_{(i0,...in): T[i0,...,in]>0} rank(i0,...,in)
-             But since we only care about the VALUE (not identity) for Jaccard:
-             hash_j(T) ≈ min_{nonzero cells} rank(i0,...,in)
-             and two tensors agree on hash j iff their minimising cells coincide.
-
-        For Jaccard estimation, we compare the minimum rank values directly:
-          Pr[min_rank_A == min_rank_B] ≈ J(A,B)
-
-        In practice we use a more numerically stable variant: we compute the
-        minimum rank value among nonzero cells, then discretise it into a
-        bucket. Two tensors with the same minimum-rank index agree on that hash.
-
-        Returns: signature of shape (num_hashes,) — integer hash values
-        """
-        assert tensor.shape == self.cfg.shape, (
-            f"Expected {self.cfg.shape}, got {tensor.shape}"
-        )
-
-        # Get flat indices of nonzero cells
-        nonzero_idx = np.argwhere(tensor > 0)  # shape (nnz, ndim)
-        if len(nonzero_idx) == 0:
-            return np.zeros(self.cfg.num_hashes, dtype=np.int32)
-
-        signature = np.empty(self.cfg.num_hashes, dtype=np.int32)
-
-        for j in range(self.cfg.num_hashes):
-            # Additive rank: sum of Exp(1) r.v.s per mode
-            # rank_j(i0,...,in) = E0[j,i0] + E1[j,i1] + ... + En[j,in]
-            # argmin of this sum approximates the MinHash function correctly
-            ranks = np.zeros(len(nonzero_idx), dtype=np.float64)
-            for mode in range(self.cfg.ndim):
-                mode_indices = nonzero_idx[:, mode]
-                ranks += self.factors[mode][j, mode_indices]
-
-            # Hash value = index of cell with minimum rank
-            min_cell_flat = np.argmin(ranks)
-            # Encode the multi-index as a single integer for comparison
-            multi_idx = nonzero_idx[min_cell_flat]
-            cell_id = int(np.ravel_multi_index(multi_idx, self.cfg.shape))
-            signature[j] = cell_id
-
-        return signature
-
-    def jaccard_from_signatures(
-        self,
-        sig_a: np.ndarray,
-        sig_b: np.ndarray,
-    ) -> float:
-        """
-        Estimate Jaccard similarity from two MinHash signatures.
-        J(A,B) ≈ #(sig_a == sig_b) / k
-        """
-        return float(np.mean(sig_a == sig_b))
-
-    def memory_stats(self) -> Dict[str, int]:
-        return {
-            "kron_params": self.param_count,
-            "full_params_theoretical": self.full_param_count,
-            "compression_ratio": self.full_param_count // max(self.param_count, 1),
-            "kron_bytes": self.param_count * 8,   # float64
-            "full_bytes_theoretical": self.full_param_count * 8,
-        }
-
-
 class TTDecomposedMinHash:
-    """
-    MinHash using Tensor Train (TT) decomposed hash functions.
-
-    The TT decomposition represents the hash weight tensor W as a product of
-    3-way TT-cores G_k ∈ R^{r_{k-1} × n_k × r_k}:
-
-        W[i_1, i_2, ..., i_d] = G_1[:, i_1, :] * G_2[:, i_2, :] * ... * G_d[:, i_d, :]
-
-    This contracts from left to right, turning the exponential parameter count
-    into a linear one: O(d * n * r^2) instead of O(n^d).
-
-    For large-scale use, TT-format allows distributed contraction (each core
-    can live on a different worker) — critical for PySpark integration.
-    """
+    """MinHash using Tensor Train (TT) decomposed hash functions."""
 
     def __init__(self, config: TTMinHashConfig):
         self.cfg = config
         rng = np.random.default_rng(config.seed + 1)
         r = config.tt_rank
+        ndim = config.ndim
 
-        # Build TT-cores: shapes r_{k-1} × n_k × r_k
-        # Boundary conditions: r_0 = r_d = num_hashes
-        self.cores: List[np.ndarray] = []
-        ranks = [config.num_hashes] + [r] * (config.ndim - 1) + [config.num_hashes]
+        # k independent TT decompositions; each is a list of d cores.
+        # Boundary ranks are 1 (standard TT), inner ranks are tt_rank.
+        # Core shapes: (1, n_0, r), (r, n_1, r), ..., (r, n_{d-1}, 1)
+        self.all_cores: list[list[np.ndarray]] = []
 
-        for k, n_k in enumerate(config.shape):
-            r_left, r_right = ranks[k], ranks[k + 1]
-            core = rng.standard_normal((r_left, n_k, r_right)).astype(np.float32)
-            # Orthogonalise for numerical stability
-            core_mat = core.reshape(r_left * n_k, r_right)
-            if r_left * n_k >= r_right:
-                core_mat, _ = np.linalg.qr(core_mat)
-                core = core_mat[:, :r_right].reshape(r_left, n_k, r_right)
-            self.cores.append(core)
+        for _ in range(config.num_hashes):
+            cores: list[np.ndarray] = []
+            for k_mode, n_k in enumerate(config.shape):
+                r_left = 1 if k_mode == 0 else r
+                r_right = 1 if k_mode == ndim - 1 else r
+                core = rng.standard_normal((r_left, n_k, r_right)).astype(np.float32)
+                # Left-orthogonalise for numerical stability
+                core_mat = core.reshape(r_left * n_k, r_right)
+                if r_left * n_k >= r_right:
+                    core_mat, _ = np.linalg.qr(core_mat)
+                    core = core_mat[:, :r_right].reshape(r_left, n_k, r_right)
+                cores.append(core)
+            self.all_cores.append(cores)
 
-        self.param_count = sum(c.size for c in self.cores)
+        self.param_count = sum(sum(c.size for c in cores) for cores in self.all_cores)
+        self.full_param_count = int(np.prod(config.shape)) * config.num_hashes
+
+        # Precompute stacked cores: _stacked_cores[m] shape (num_hashes, r_left, n_m, r_right)
+        self._stacked_cores: list[np.ndarray] = [
+            np.stack([self.all_cores[j][m] for j in range(config.num_hashes)], axis=0)
+            for m in range(config.ndim)
+        ]
+
+        # Precompute prefix product of the first (ndim-1) cores contracted over all
+        # (i0, i1, ..., i_{d-2}) index combinations.  This is a one-time O(K·n^(d-1)·r²)
+        # cost that reduces each hash_tensor call to two gathers + one elementwise dot.
+        #
+        # _prefix_flat shape: (K, n0*...*n_{d-2}, r)  - contiguous for fast fancy indexing
+        # _last_core_T  shape: (K, n_{d-1}, r)         - last core transposed for gather
+        K_ = config.num_hashes
+        if config.ndim >= 2:
+            prefix = self._stacked_cores[0][:, 0, :, :]  # (K, n0, r)  - squeeze r_left=1
+            for m in range(1, config.ndim - 1):
+                sc = self._stacked_cores[m]               # (K, r_left, n_m, r_right)
+                n_prev = prefix.size // (K_ * sc.shape[1])
+                pre2d = prefix.reshape(K_, n_prev, sc.shape[1])
+                # result[k,p,i,s] = Σ_r pre2d[k,p,r] * sc[k,r,i,s]
+                result = np.einsum("kpr,kris->kpis", pre2d, sc, optimize=True)
+                prefix = result.reshape((K_,) + config.shape[: m + 1] + (sc.shape[3],))
+
+            n_spatial = int(np.prod(config.shape[:-1]))
+            self._prefix_flat = np.ascontiguousarray(
+                prefix.reshape(K_, n_spatial, prefix.shape[-1])
+            )  # (K, n_spa, r)
+            self._last_core_T = np.ascontiguousarray(
+                self._stacked_cores[-1][:, :, :, 0].transpose(0, 2, 1)
+            )  # (K, n_last, r)  - squeeze r_right=1, then swap axes
 
     def hash_tensor(self, tensor: np.ndarray) -> np.ndarray:
         """
-        Compute MinHash signature via left-to-right TT contraction.
+        Compute MinHash signature using precomputed prefix cores.
 
-        For each position in the tensor, we contract its value against the
-        corresponding TT slice. The final shape is (num_hashes, num_hashes),
-        and we take the diagonal as the projection vector.
+        For ndim >= 2 the score of cell (i0, ..., i_{d-1}) under plane k is:
+            score_k = prefix_flat[k, flat(i0,...,i_{d-2}), :] · last_core_T[k, i_{d-1}, :]
+        Both operands are gathered with a single fancy-index step; no Python loops
+        over hash planes are needed.
+
+        Returns: signature of shape (num_hashes,) - integer hash values.
         """
-        assert tensor.shape == self.cfg.shape
-        tensor = tensor.astype(np.float32)
+        assert tensor.shape == self.cfg.shape, f"Expected {self.cfg.shape}, got {tensor.shape}"
 
-        # Left-to-right contraction
-        # state shape: (num_hashes,) initially, grows to (num_hashes, r, ...)
-        state = np.ones(self.cfg.num_hashes, dtype=np.float32)
+        nonzero_idx = np.argwhere(tensor > 0)  # (nnz, ndim)
+        if len(nonzero_idx) == 0:
+            return np.zeros(self.cfg.num_hashes, dtype=np.int32)
 
-        for mode, core in enumerate(self.cores):
-            # tensor mode marginal: sum over all other modes
-            marginal = np.tensordot(tensor, np.ones(
-                [s for i, s in enumerate(self.cfg.shape) if i != mode]
-            ), axes=(
-                [i for i in range(self.cfg.ndim) if i != mode],
-                list(range(self.cfg.ndim - 1))
-            ))  # shape: (n_k,)
+        if self.cfg.ndim == 1:
+            # Degenerate case: score is just the single core value.
+            scores = self._stacked_cores[0][:, 0, nonzero_idx[:, 0], 0]  # (K, nnz)
+        else:
+            # Flatten first (ndim-1) mode indices -> single 1-D index for prefix gather.
+            flat_idx = np.ravel_multi_index(
+                nonzero_idx[:, :-1].T.astype(np.intp), self.cfg.shape[:-1]
+            )  # (nnz,)
+            pref  = self._prefix_flat[:, flat_idx, :]           # (K, nnz, r)
+            last  = self._last_core_T[:, nonzero_idx[:, -1], :] # (K, nnz, r)
+            scores = (pref * last).sum(-1)                      # (K, nnz)
 
-            # Contract: state (r_left,) x core (r_left, n_k, r_right) x marginal (n_k,)
-            # → new_state (r_right,)
-            contracted = np.einsum("i,ijk,j->k", state, core, marginal)
-            state = contracted
+        min_cells = np.argmin(scores, axis=1)          # (K,)
+        multi_indices = nonzero_idx[min_cells]          # (K, ndim)
+        return np.ravel_multi_index(multi_indices.T, self.cfg.shape).astype(np.int32)
 
-        return (state > 0).astype(np.int32)
-
-    def jaccard_from_signatures(self, sig_a, sig_b) -> float:
+    def jaccard_from_signatures(self, sig_a: np.ndarray, sig_b: np.ndarray) -> float:
+        """Estimate Jaccard similarity. J(A,B) ≈ #(sig_a == sig_b) / k"""
         return float(np.mean(sig_a == sig_b))
+
+    def memory_stats(self) -> dict[str, int]:
+        """Return parameter storage statistics."""
+        tt_bytes = self.param_count * 4  # float32
+        full_bytes = self.full_param_count * 4
+        return {
+            "tt_params": self.param_count,
+            "full_params_theoretical": self.full_param_count,
+            "compression_ratio": self.full_param_count // max(self.param_count, 1),
+            "tt_bytes": tt_bytes,
+            "full_bytes_theoretical": full_bytes,
+        }
